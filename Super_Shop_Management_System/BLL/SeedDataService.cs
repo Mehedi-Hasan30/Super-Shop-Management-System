@@ -23,17 +23,18 @@ namespace Super_Shop_Management_System.BLL
             int count = Convert.ToInt32(await _dbHelper.ExecuteScalarAsync(exists, new SqlParameter("@Username", "admin")));
             if (count > 0) return;
 
-            const string insert = @"INSERT INTO Users (FullName, Username, Password, Role, Email, SecurityQuestion, SecurityAnswer, CreatedDate)
-                                    VALUES (@FullName, @Username, @Password, @Role, @Email, @SecurityQuestion, @SecurityAnswer, @CreatedDate)";
+            const string insert = @"INSERT INTO Users (FullName, Username, Password, Role, Email, SecurityQuestion, SecurityAnswer, CreatedDate, PasswordAlgorithm)
+                                    VALUES (@FullName, @Username, @Password, @Role, @Email, @SecurityQuestion, @SecurityAnswer, @CreatedDate, @PasswordAlgorithm)";
             await _dbHelper.ExecuteNonQueryAsync(insert,
                 new SqlParameter("@FullName", "System Administrator"),
                 new SqlParameter("@Username", "admin"),
-                new SqlParameter("@Password", SecurityHelper.HashValue("Admin@123")),
+                new SqlParameter("@Password", SecurityHelper.HashPasswordForStorage("Admin@123")),
                 new SqlParameter("@Role", "Admin"),
                 new SqlParameter("@Email", "admin@supershop.local"),
                 new SqlParameter("@SecurityQuestion", "What is your favorite color?"),
                 new SqlParameter("@SecurityAnswer", SecurityHelper.HashValue("blue")),
-                new SqlParameter("@CreatedDate", DateTime.Now));
+                new SqlParameter("@CreatedDate", DateTime.Now),
+                new SqlParameter("@PasswordAlgorithm", SecurityHelper.CurrentAlgorithm));
         }
 
         private async Task EnsureCategoryAsync()

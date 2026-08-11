@@ -10,28 +10,21 @@ namespace Super_Shop_Management_System.DAL
     {
         private readonly DBHelper _dbHelper = new DBHelper();
 
-        public User Authenticate(string username, string passwordHash)
+        public User GetByUsername(string username)
         {
-            const string query = @"SELECT TOP 1 UserID, FullName, Username, Password, Role, Email, SecurityQuestion, SecurityAnswer, CreatedDate
+            const string query = @"SELECT TOP 1 UserID, FullName, Username, Password, Role, Email, SecurityQuestion, SecurityAnswer, CreatedDate, PasswordAlgorithm
                                    FROM Users
-                                   WHERE Username = @Username AND Password = @Password";
+                                   WHERE Username = @Username";
 
             DataTable table = _dbHelper.ExecuteDataTable(query,
-                new SqlParameter("@Username", username),
-                new SqlParameter("@Password", passwordHash));
+                new SqlParameter("@Username", username));
 
-            if (table.Rows.Count == 0)
-            {
-                return null;
-            }
-
-            DataRow row = table.Rows[0];
-            return MapUser(row);
+            return table.Rows.Count == 0 ? null : MapUser(table.Rows[0]);
         }
 
         public User GetByUsernameAndEmail(string username, string email)
         {
-            const string query = @"SELECT TOP 1 UserID, FullName, Username, Password, Role, Email, SecurityQuestion, SecurityAnswer, CreatedDate
+            const string query = @"SELECT TOP 1 UserID, FullName, Username, Password, Role, Email, SecurityQuestion, SecurityAnswer, CreatedDate, PasswordAlgorithm
                                    FROM Users
                                    WHERE Username = @Username AND Email = @Email";
 
@@ -42,11 +35,14 @@ namespace Super_Shop_Management_System.DAL
             return table.Rows.Count == 0 ? null : MapUser(table.Rows[0]);
         }
 
-        public bool UpdatePassword(int userId, string newPasswordHash)
+        public bool UpdatePassword(int userId, string newPasswordHash, string algorithm)
         {
-            const string query = "UPDATE Users SET Password = @Password WHERE UserID = @UserID";
+            const string query = @"UPDATE Users
+                                   SET Password = @Password, PasswordAlgorithm = @PasswordAlgorithm
+                                   WHERE UserID = @UserID";
             int affectedRows = _dbHelper.ExecuteNonQuery(query,
                 new SqlParameter("@Password", newPasswordHash),
+                new SqlParameter("@PasswordAlgorithm", algorithm),
                 new SqlParameter("@UserID", userId));
 
             return affectedRows > 0;
@@ -64,7 +60,10 @@ namespace Super_Shop_Management_System.DAL
                 Email = row["Email"].ToString(),
                 SecurityQuestion = row["SecurityQuestion"].ToString(),
                 SecurityAnswer = row["SecurityAnswer"].ToString(),
-                CreatedDate = Convert.ToDateTime(row["CreatedDate"])
+                CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
+                PasswordAlgorithm = row.Table.Columns.Contains("PasswordAlgorithm") && row["PasswordAlgorithm"] != DBNull.Value
+                    ? row["PasswordAlgorithm"].ToString()
+                    : SecurityHelper.AlgorithmSha256
             };
         }
     }

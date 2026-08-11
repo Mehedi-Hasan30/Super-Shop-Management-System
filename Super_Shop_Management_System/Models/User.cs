@@ -13,5 +13,12 @@ namespace Super_Shop_Management_System.Models
         public string SecurityQuestion { get; set; }
         public string SecurityAnswer { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        /// <summary>
+        /// Which algorithm the stored Password hash uses: "SHA256" (legacy)
+        /// or "BCrypt" (current). Drives backward-compatible verification
+        /// and transparent migration in AuthService.
+        /// </summary>
+        public string PasswordAlgorithm { get; set; } = "SHA256";
     }
 }

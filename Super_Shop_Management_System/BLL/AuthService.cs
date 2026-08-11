@@ -18,13 +18,28 @@ namespace Super_Shop_Management_System.BLL
             }
 
             string normalizedUsername = username.Trim();
-            string passwordHash = SecurityHelper.HashValue(password);
-            User user = _userRepository.Authenticate(normalizedUsername, passwordHash);
 
-            if (user == null)
+            User user = _userRepository.GetByUsername(normalizedUsername);
+
+            bool passwordOk = user != null &&
+                SecurityHelper.VerifyPassword(password, user.Password, user.PasswordAlgorithm);
+
+            if (!passwordOk)
             {
                 _auditLogService.Log("LOGIN_FAIL", "Users", normalizedUsername, normalizedUsername, "Failed login attempt.");
                 throw new ApplicationException("Invalid username or password.");
+            }
+
+            if (SecurityHelper.NeedsMigration(user.PasswordAlgorithm))
+            {
+                string upgradedHash = SecurityHelper.HashPasswordForStorage(password);
+                bool migrated = _userRepository.UpdatePassword(user.UserID, upgradedHash, SecurityHelper.CurrentAlgorithm);
+                if (migrated)
+                {
+                    user.Password = upgradedHash;
+                    user.PasswordAlgorithm = SecurityHelper.CurrentAlgorithm;
+                    _auditLogService.Log("UPDATE", "Users", user.UserID.ToString(), user.Username, "Password hash migrated SHA256 -> BCrypt on login.");
+                }
             }
 
             SessionManager.StartSession(user.UserID, user.Username, user.FullName, user.Role);
@@ -61,7 +76,10 @@ namespace Super_Shop_Management_System.BLL
                 throw new ApplicationException("Security answer is incorrect.");
             }
 
-            bool success = _userRepository.UpdatePassword(userId, SecurityHelper.HashValue(newPassword));
+            bool success = _userRepository.UpdatePassword(
+                userId,
+                SecurityHelper.HashPasswordForStorage(newPassword),
+                SecurityHelper.CurrentAlgorithm);
             if (success)
             {
                 _auditLogService.Log("UPDATE", "Users", userId.ToString(), SessionManager.Username, "Password reset executed.");
