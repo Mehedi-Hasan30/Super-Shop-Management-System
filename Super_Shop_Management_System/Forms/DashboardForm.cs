@@ -44,7 +44,7 @@ namespace Super_Shop_Management_System.Forms
             WindowState = FormWindowState.Maximized;
             ThemeManager.ApplyFormTheme(this);
 
-            Panel sidebar = new Panel { Dock = DockStyle.Left, Width = 240, BackColor = ThemeManager.Sidebar };
+            Panel sidebar = new Panel { Dock = DockStyle.Left, Width = 240, BackColor = ThemeManager.Sidebar, Tag = ThemeManager.ThemeExemptTag };
 
             Panel brandPanel = new Panel { Dock = DockStyle.Top, Height = 64, BackColor = ThemeManager.Sidebar };
             Label brandIcon = IconHelper.CreateIconLabel(IconHelper.Glyphs.Products, 20F, Color.White);
@@ -346,3 +346,4 @@ namespace Super_Shop_Management_System.Forms
         }
     }
 }
+

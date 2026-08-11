@@ -15,6 +15,8 @@ namespace Super_Shop_Management_System.Helpers
     {
         private const string ThemeHookTag = "__ThemeManagerHooked__";
 
+        public const string ThemeExemptTag = "__ThemeExempt__";
+
         public static readonly Color Primary = Color.FromArgb(41, 128, 185);
         public static readonly Color PrimaryDark = Color.FromArgb(31, 97, 141);
         public static readonly Color Accent = Color.FromArgb(52, 152, 219);
@@ -177,6 +179,11 @@ namespace Super_Shop_Management_System.Helpers
         {
             if (c == null) return;
 
+            if (c.Tag is string tag && string.Equals(tag, ThemeExemptTag, StringComparison.Ordinal))
+            {
+                return;
+            }
+
             if (c is DataGridView grid)
             {
                 BaseGridStyler.Apply(grid);
@@ -237,3 +244,5 @@ namespace Super_Shop_Management_System.Helpers
         }
     }
 }
+
+

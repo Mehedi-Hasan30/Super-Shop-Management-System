@@ -16,6 +16,7 @@ namespace Super_Shop_Management_System.Helpers
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
                      ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             BackColor = ThemeManager.PanelBackground;
+            Tag = ThemeManager.ThemeExemptTag;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -81,6 +82,7 @@ namespace Super_Shop_Management_System.Helpers
                      ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             FlatStyle = FlatStyle.Flat;
             FlatAppearance.BorderSize = 0;
+            Tag = ThemeManager.ThemeExemptTag;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -220,3 +222,5 @@ namespace Super_Shop_Management_System.Helpers
         }
     }
 }
+
+

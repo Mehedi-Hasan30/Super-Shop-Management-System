@@ -47,7 +47,8 @@ namespace Super_Shop_Management_System.Helpers
                 Font = GlyphFont(sizeInPoints),
                 ForeColor = color,
                 AutoSize = true,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                Tag = ThemeManager.ThemeExemptTag
             };
         }
 
@@ -92,3 +93,4 @@ namespace Super_Shop_Management_System.Helpers
         }
     }
 }
+
