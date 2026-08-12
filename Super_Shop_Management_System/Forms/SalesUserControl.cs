@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -77,16 +78,18 @@ namespace Super_Shop_Management_System.Forms
             _txtBarcode = new TextBox { Location = new Point(12, 75), Width = 300 };
             _txtBarcode.KeyDown += TxtBarcode_KeyDown;
 
-            _gridProducts = new DataGridView
-            {
-                Location = new Point(12, 105),
-                Size = new Size(460, 400),
-                ReadOnly = true,
-                AutoGenerateColumns = false,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = false,
-                AllowUserToAddRows = false
-            };
+_gridProducts = new DataGridView
+                {
+                    Location = new Point(12, 105),
+                    Size = new Size(460, 400),
+                    ReadOnly = true,
+                    AutoGenerateColumns = false,
+                    SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                    MultiSelect = false,
+                    AllowUserToAddRows = false
+                };
+
+DataGridStyler.ApplyModernStyle(_gridProducts);
             _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductID", HeaderText = "ID", Width = 50 });
             _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Product", Width = 180 });
             _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Barcode", HeaderText = "Barcode", Width = 120 });
@@ -412,7 +415,7 @@ try
                 _cmbPaymentMethod.SelectedIndex = -1;
                 RefreshCart();
 
-                MessageBox.Show($"Sale saved successfully. SaleID: {saleId}", "POS", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show($"Sale saved successfully. SaleID: {saleId}");
             }
             catch (Exception ex)
             {

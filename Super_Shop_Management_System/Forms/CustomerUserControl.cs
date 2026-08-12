@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
@@ -79,6 +79,8 @@ namespace Super_Shop_Management_System.Forms
                 MultiSelect = false,
                 AllowUserToAddRows = false
             };
+
+DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CustomerID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "FullName", HeaderText = "Customer", Width = 170 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Phone", HeaderText = "Phone", Width = 110 });
@@ -101,14 +103,17 @@ namespace Super_Shop_Management_System.Forms
 
         private async Task LoadCustomersAsync(string keyword = "")
         {
-            try
+            using (var loading = new LoadingIndicator(this, "Loading customers..."))
             {
-                List<Customer> customers = await _customerService.GetAllAsync(keyword);
-                _grid.DataSource = customers;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to load customers: {ex.Message}", "Customer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                try
+                {
+                    List<Customer> customers = await _customerService.GetAllAsync(keyword);
+                    _grid.DataSource = customers;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to load customers: {ex.Message}", "Customer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
@@ -156,7 +161,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadCustomersAsync(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Customer added successfully.", "Customer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Customer added successfully.");
                 }
             }
             catch (Exception ex)
@@ -184,7 +189,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadCustomersAsync(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Customer updated successfully.", "Customer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Customer updated successfully.");
                 }
             }
             catch (Exception ex)
@@ -211,7 +216,7 @@ namespace Super_Shop_Management_System.Forms
                 await _customerService.DeleteAsync(_selectedId);
                 await LoadCustomersAsync(_txtSearch.Text);
                 ClearInputs();
-                MessageBox.Show("Customer deleted successfully.", "Customer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show("Customer deleted successfully.");
             }
             catch (Exception ex)
             {

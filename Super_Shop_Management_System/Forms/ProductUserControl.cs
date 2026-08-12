@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -135,6 +136,8 @@ namespace Super_Shop_Management_System.Forms
                 MultiSelect = false,
                 AutoGenerateColumns = false
             };
+
+DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Product", Width = 150 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Barcode", HeaderText = "Barcode", Width = 120 });
@@ -169,24 +172,27 @@ namespace Super_Shop_Management_System.Forms
 
         private void LoadProducts(string search = "")
         {
-            try
+            using (var loading = new LoadingIndicator(this, "Loading products..."))
             {
-                List<Product> products = _productService.GetAll(search);
-                _grid.DataSource = products;
-                int lowStock = 0;
-                foreach (Product product in products)
+                try
                 {
-                    if (product.StockQuantity <= product.ReorderLevel)
+                    List<Product> products = _productService.GetAll(search);
+                    _grid.DataSource = products;
+                    int lowStock = 0;
+                    foreach (Product product in products)
                     {
-                        lowStock++;
+                        if (product.StockQuantity <= product.ReorderLevel)
+                        {
+                            lowStock++;
+                        }
                     }
-                }
 
-                _lblStockAlert.Text = $"Low Stock Items: {lowStock}";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to load products: {ex.Message}", "Product", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    _lblStockAlert.Text = $"Low Stock Items: {lowStock}";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to load products: {ex.Message}", "Product", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
@@ -250,7 +256,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     LoadProducts(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Product added successfully.", "Product", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Product added successfully.");
                 }
             }
             catch (Exception ex)
@@ -283,7 +289,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     LoadProducts(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Product updated successfully.", "Product", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Product updated successfully.");
                 }
             }
             catch (Exception ex)
@@ -313,7 +319,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     LoadProducts(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Product deleted successfully.", "Product", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Product deleted successfully.");
                 }
             }
             catch (Exception ex)

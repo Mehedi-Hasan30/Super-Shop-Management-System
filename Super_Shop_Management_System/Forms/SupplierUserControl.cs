@@ -80,6 +80,8 @@ namespace Super_Shop_Management_System.Forms
                 MultiSelect = false,
                 AllowUserToAddRows = false
             };
+
+DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SupplierID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SupplierName", HeaderText = "Supplier Name", Width = 200 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CompanyName", HeaderText = "Company Name", Width = 150 });
@@ -101,14 +103,17 @@ namespace Super_Shop_Management_System.Forms
 
         private async Task LoadSuppliersAsync(string keyword = "")
         {
-            try
+            using (var loading = new LoadingIndicator(this, "Loading suppliers..."))
             {
-                List<Supplier> suppliers = await _supplierService.GetAllAsync(keyword);
-                _grid.DataSource = suppliers;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to load suppliers: {ex.Message}", "Supplier", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                try
+                {
+                    List<Supplier> suppliers = await _supplierService.GetAllAsync(keyword);
+                    _grid.DataSource = suppliers;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to load suppliers: {ex.Message}", "Supplier", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
@@ -162,7 +167,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadSuppliersAsync(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Supplier added successfully.", "Supplier", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Supplier added successfully.");
                 }
             }
             catch (Exception ex)
@@ -193,7 +198,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadSuppliersAsync(_txtSearch.Text);
                     ClearInputs();
-                    MessageBox.Show("Supplier updated successfully.", "Supplier", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Supplier updated successfully.");
                 }
             }
             catch (Exception ex)
@@ -220,7 +225,7 @@ namespace Super_Shop_Management_System.Forms
                 await _supplierService.DeleteAsync(supplier.SupplierID);
                 await LoadSuppliersAsync(_txtSearch.Text);
                 ClearInputs();
-                MessageBox.Show("Supplier deleted successfully.", "Supplier", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show("Supplier deleted successfully.");
             }
             catch (Exception ex)
             {

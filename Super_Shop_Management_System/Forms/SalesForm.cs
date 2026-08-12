@@ -379,79 +379,79 @@ namespace Super_Shop_Management_System.Forms
             Button btn = sender as Button;
             if (btn != null) btn.Enabled = false;
 
-            try
+            using (var loading = new LoadingIndicator(this, "Processing sale..."))
             {
-                IReadOnlyList<CartItem> cartItems = _posService.GetCartItems();
-                if (cartItems == null || cartItems.Count == 0)
-                {
-                    MessageBox.Show("Cart is empty.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                PaymentMethod? selectedPayment = GetSelectedPaymentMethod();
-                if (selectedPayment == null)
-                {
-                    MessageBox.Show("Please select a payment method.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                SalePaymentStatus? selectedPaymentStatus = GetSelectedPaymentStatus();
-                if (selectedPaymentStatus == null)
-                {
-                    MessageBox.Show("Please select a payment status.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                PosTotals totals = _posService.CalculateTotals(_numDiscount.Value, _numVat.Value);
-                decimal grandTotal = totals.GrandTotal;
-                if (grandTotal <= 0)
-                {
-                    MessageBox.Show("Grand total must be greater than zero.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                decimal paymentAmount = selectedPayment == PaymentMethod.Cash
-                    ? _numPaymentAmount.Value
-                    : grandTotal; // card/mobile assume full payment
-
-                int saleId = await _salesService.SaveSaleAsync(
-                    cartItems,
-                    totals,
-                    selectedPayment.Value,
-                    paymentAmount,
-                    selectedPaymentStatus.Value,
-                    customerId: null);
-
-                _posService.ClearCart();
-                _numPaymentAmount.Value = 0;
-                _cmbPaymentMethod.SelectedIndex = -1;
-                RefreshCart();
-
-                MessageBox.Show($"Sale saved successfully. SaleID: {saleId}", "POS", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Professional POS cycle: show invoice preview for both Paid and Pending sales.
                 try
                 {
-                    using (InvoiceForm invoiceForm = new InvoiceForm(saleId))
+                    IReadOnlyList<CartItem> cartItems = _posService.GetCartItems();
+                    if (cartItems == null || cartItems.Count == 0)
                     {
-                        invoiceForm.ShowDialog(this);
+                        MessageBox.Show("Cart is empty.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    PaymentMethod? selectedPayment = GetSelectedPaymentMethod();
+                    if (selectedPayment == null)
+                    {
+                        MessageBox.Show("Please select a payment method.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    SalePaymentStatus? selectedPaymentStatus = GetSelectedPaymentStatus();
+                    if (selectedPaymentStatus == null)
+                    {
+                        MessageBox.Show("Please select a payment status.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    PosTotals totals = _posService.CalculateTotals(_numDiscount.Value, _numVat.Value);
+                    decimal grandTotal = totals.GrandTotal;
+                    if (grandTotal <= 0)
+                    {
+                        MessageBox.Show("Grand total must be greater than zero.", "POS", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    decimal paymentAmount = selectedPayment == PaymentMethod.Cash
+                        ? _numPaymentAmount.Value
+                        : grandTotal; // card/mobile assume full payment
+
+                    int saleId = await _salesService.SaveSaleAsync(
+                        cartItems,
+                        totals,
+                        selectedPayment.Value,
+                        paymentAmount,
+                        selectedPaymentStatus.Value,
+                        customerId: null);
+
+                    _posService.ClearCart();
+                    _numPaymentAmount.Value = 0;
+                    _cmbPaymentMethod.SelectedIndex = -1;
+                    RefreshCart();
+
+                    MessageBox.Show($"Sale saved successfully. SaleID: {saleId}", "POS", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Professional POS cycle: show invoice preview for both Paid and Pending sales.
+                    try
+                    {
+                        using (InvoiceForm invoiceForm = new InvoiceForm(saleId))
+                        {
+                            invoiceForm.ShowDialog(this);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Sale is already saved; invoice preview failure should not block checkout completion.
+                        ErrorLogger.Log("SalesForm.InvoicePreviewAfterCheckout", ex);
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Sale is already saved; invoice preview failure should not block checkout completion.
-                    ErrorLogger.Log("SalesForm.InvoicePreviewAfterCheckout", ex);
+                    ErrorLogger.Log("SalesForm.BtnCheckout_ClickAsync", ex);
+                    MessageBox.Show(ex.Message, "POS", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch (Exception ex)
-            {
-                ErrorLogger.Log("SalesForm.BtnCheckout_ClickAsync", ex);
-                MessageBox.Show(ex.Message, "POS", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                if (btn != null) btn.Enabled = true;
-            }
+            if (btn != null) btn.Enabled = true;
         }
     }
 }

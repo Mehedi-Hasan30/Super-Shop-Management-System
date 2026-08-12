@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -71,6 +72,8 @@ namespace Super_Shop_Management_System.Forms
                 MultiSelect = false,
                 AllowUserToAddRows = false
             };
+
+DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CategoryID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CategoryName", HeaderText = "Category Name", Width = 200 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Description", HeaderText = "Description", Width = 200 });
@@ -135,7 +138,7 @@ namespace Super_Shop_Management_System.Forms
                 _categoryService.Add(category);
                 LoadCategories();
                 ClearInputs();
-                MessageBox.Show("Category added successfully.", "Category", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show("Category added successfully.");
             }
             catch (Exception ex)
             {
@@ -159,7 +162,7 @@ namespace Super_Shop_Management_System.Forms
                 _categoryService.Update(category);
                 LoadCategories();
                 ClearInputs();
-                MessageBox.Show("Category updated successfully.", "Category", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show("Category updated successfully.");
             }
             catch (Exception ex)
             {
@@ -185,7 +188,7 @@ namespace Super_Shop_Management_System.Forms
                 _categoryService.Delete(category.CategoryID);
                 LoadCategories();
                 ClearInputs();
-                MessageBox.Show("Category deleted successfully.", "Category", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show("Category deleted successfully.");
             }
             catch (Exception ex)
             {

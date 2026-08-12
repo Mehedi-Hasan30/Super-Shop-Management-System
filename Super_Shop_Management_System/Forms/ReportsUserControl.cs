@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -99,6 +100,8 @@ namespace Super_Shop_Management_System.Forms
                 AllowUserToAddRows = false
             };
 
+DataGridStyler.ApplyModernStyle(_grid);
+
             Controls.Add(title);
             Controls.Add(panel);
             panel.Controls.Add(_cmbReportType);
@@ -127,38 +130,41 @@ namespace Super_Shop_Management_System.Forms
 
         private async void BtnLoad_Click(object sender, EventArgs e)
         {
-            try
+            using (var loading = new LoadingIndicator(this, "Loading report..."))
             {
-                ReportType reportType = ReportType.DailySales;
-                switch (_cmbReportType.SelectedItem.ToString())
+                try
                 {
-                    case "Daily Sales": reportType = ReportType.DailySales; break;
-                    case "Monthly Sales": reportType = ReportType.MonthlySales; break;
-                    case "Product Sales": reportType = ReportType.ProductSales; break;
-                    case "Customer Purchase": reportType = ReportType.CustomerPurchase; break;
-                    case "Supplier Purchase": reportType = ReportType.SupplierPurchase; break;
-                    case "Employee Sales": reportType = ReportType.EmployeeSales; break;
-                    case "Pending Sales": reportType = ReportType.PendingSales; break;
-                    case "Paid Sales": reportType = ReportType.PaidSales; break;
-                    case "Inventory Stock": reportType = ReportType.InventoryStock; break;
-                    case "Low Stock": reportType = ReportType.LowStock; break;
-                    case "Expiry Products": reportType = ReportType.ExpiryProducts; break;
-                    case "Attendance": reportType = ReportType.Attendance; break;
+                    ReportType reportType = ReportType.DailySales;
+                    switch (_cmbReportType.SelectedItem.ToString())
+                    {
+                        case "Daily Sales": reportType = ReportType.DailySales; break;
+                        case "Monthly Sales": reportType = ReportType.MonthlySales; break;
+                        case "Product Sales": reportType = ReportType.ProductSales; break;
+                        case "Customer Purchase": reportType = ReportType.CustomerPurchase; break;
+                        case "Supplier Purchase": reportType = ReportType.SupplierPurchase; break;
+                        case "Employee Sales": reportType = ReportType.EmployeeSales; break;
+                        case "Pending Sales": reportType = ReportType.PendingSales; break;
+                        case "Paid Sales": reportType = ReportType.PaidSales; break;
+                        case "Inventory Stock": reportType = ReportType.InventoryStock; break;
+                        case "Low Stock": reportType = ReportType.LowStock; break;
+                        case "Expiry Products": reportType = ReportType.ExpiryProducts; break;
+                        case "Attendance": reportType = ReportType.Attendance; break;
+                    }
+
+                    ReportFilters filters = new ReportFilters
+                    {
+                        FromDate = _dtpFromDate.Value,
+                        ToDate = _dtpToDate.Value,
+                        PaymentStatus = _cmbPaymentStatus.SelectedItem?.ToString()
+                    };
+
+                    DataTable reportData = await _reportsService.GetReportDataAsync(reportType, filters);
+                    _grid.DataSource = reportData;
                 }
-
-                ReportFilters filters = new ReportFilters
+                catch (Exception ex)
                 {
-                    FromDate = _dtpFromDate.Value,
-                    ToDate = _dtpToDate.Value,
-                    PaymentStatus = _cmbPaymentStatus.SelectedItem?.ToString()
-                };
-
-                DataTable reportData = await _reportsService.GetReportDataAsync(reportType, filters);
-                _grid.DataSource = reportData;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to load report: {ex.Message}", "Report", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show($"Unable to load report: {ex.Message}", "Report", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
     }

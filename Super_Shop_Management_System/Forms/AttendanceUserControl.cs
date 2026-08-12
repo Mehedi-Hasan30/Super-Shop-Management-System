@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -89,6 +90,8 @@ namespace Super_Shop_Management_System.Forms
                 MultiSelect = false,
                 AllowUserToAddRows = false
             };
+
+DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "EmployeeName", HeaderText = "Employee", Width = 200 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Date", HeaderText = "Date", Width = 100 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CheckIn", HeaderText = "Check In", Width = 80 });
@@ -131,14 +134,17 @@ namespace Super_Shop_Management_System.Forms
 
         private async Task LoadAttendanceAsync(string keyword = "")
         {
-            try
+            using (var loading = new LoadingIndicator(this, "Loading attendance..."))
             {
-                var attendanceList = await _attendanceService.GetAttendanceAsync(null, null);
-                _grid.DataSource = attendanceList;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to load attendance: {ex.Message}", "Attendance", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                try
+                {
+                    var attendanceList = await _attendanceService.GetAttendanceAsync(null, null);
+                    _grid.DataSource = attendanceList;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to load attendance: {ex.Message}", "Attendance", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
@@ -198,7 +204,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadAttendanceAsync();
                     ClearInputs();
-                    MessageBox.Show("Attendance saved successfully.", "Attendance", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Attendance saved successfully.");
                 }
             }
             catch (Exception ex)

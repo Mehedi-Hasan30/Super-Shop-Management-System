@@ -34,7 +34,7 @@ namespace Super_Shop_Management_System.Forms
             themeToggle.Click += (_, __) =>
             {
                 ThemeManager.ToggleTheme();
-                MessageBox.Show($"Theme switched to {(ThemeManager.CurrentTheme.ToString() == "Dark" ? "Dark" : "Light")}", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show($"Theme switched to {(ThemeManager.CurrentTheme.ToString() == "Dark" ? "Dark" : "Light")}");
             };
             Controls.Add(themeToggle);
 

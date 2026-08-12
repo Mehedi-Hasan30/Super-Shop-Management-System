@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -90,6 +91,8 @@ namespace Super_Shop_Management_System.Forms
                 MultiSelect = false,
                 AllowUserToAddRows = false
             };
+
+DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "EmployeeID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "FullName", HeaderText = "Full Name", Width = 150 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Username", HeaderText = "Username", Width = 100 });
@@ -110,14 +113,17 @@ namespace Super_Shop_Management_System.Forms
 
         private async Task LoadEmployeesAsync(string keyword = "")
         {
-            try
+            using (var loading = new LoadingIndicator(this, "Loading employees..."))
             {
-                List<Employee> employees = await _employeeService.GetAllAsync(keyword);
-                _grid.DataSource = employees;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to load employees: {ex.Message}", "Employee", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                try
+                {
+                    List<Employee> employees = await _employeeService.GetAllAsync(keyword);
+                    _grid.DataSource = employees;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to load employees: {ex.Message}", "Employee", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 
@@ -195,7 +201,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadEmployeesAsync();
                     ClearInputs();
-                    MessageBox.Show("Employee added successfully.", "Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Employee added successfully.");
                 }
             }
             catch (Exception ex)
@@ -238,7 +244,7 @@ namespace Super_Shop_Management_System.Forms
                 {
                     await LoadEmployeesAsync();
                     ClearInputs();
-                    MessageBox.Show("Employee updated successfully.", "Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ToastNotification.Show("Employee updated successfully.");
                 }
             }
             catch (Exception ex)
@@ -265,7 +271,7 @@ namespace Super_Shop_Management_System.Forms
                 await _employeeService.DeleteAsync(employee.EmployeeID);
                 await LoadEmployeesAsync();
                 ClearInputs();
-                MessageBox.Show("Employee deleted successfully.", "Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToastNotification.Show("Employee deleted successfully.");
             }
             catch (Exception ex)
             {
