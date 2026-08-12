@@ -296,10 +296,10 @@ namespace Super_Shop_Management_System.Forms
 
                 SaveRememberedUsername();
 
-                DashboardForm dashboardForm = new DashboardForm(user.Role);
-                dashboardForm.FormClosed += (_, __) => Show();
+DashboardShell dashboardShell = new DashboardShell(user.Role);
+                dashboardShell.FormClosed += (_, __) => Show();
                 Hide();
-                dashboardForm.Show();
+                dashboardShell.Show();
                 _txtPassword.Clear();
             }
             catch (Exception ex)
