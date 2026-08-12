@@ -1,12 +1,11 @@
 using System;
 using System.Data;
-using System.Drawing;
 using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
-using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -32,30 +31,54 @@ namespace Super_Shop_Management_System.Forms
 
         private void InitializeComponent()
         {
+            // Premium header panel
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, 0),
+                Size = new Size(560, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Reports, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
             var title = new Label
             {
                 Text = "Reports & Analytics",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            var panel = new Panel
+            var separator = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(500, 200),
-                BackColor = ThemeManager.PanelBackground,
-                Padding = new Padding(12)
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Report filter panel card
+            var filterCard = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(520, 180),
+                BorderColor = ThemeManager.BorderColor,
+                Padding = new Padding(16)
             };
 
             _cmbReportType = new ComboBox
             {
-                Location = new Point(20, 40),
-                Width = 300,
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Location = new Point(filterCard.Padding.Left, filterCard.Padding.Top),
+                Size = new Size(260, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                ForeColor = ThemeManager.MutedText
             };
+
             _cmbReportType.Items.AddRange(new object[]
             {
                 "Daily Sales",
@@ -72,26 +95,86 @@ namespace Super_Shop_Management_System.Forms
                 "Attendance"
             });
 
-            _dtpFromDate = new DateTimePicker { Location = new Point(20, 90), Width = 200, Format = DateTimePickerFormat.Short };
-            _dtpToDate = new DateTimePicker { Location = new Point(240, 90), Width = 200, Format = DateTimePickerFormat.Short };
+            _dtpFromDate = new DateTimePicker
+            {
+                Location = new Point(filterCard.Padding.Left, _cmbReportType.Bottom + 16),
+                Size = new Size(240, 30),
+                Format = DateTimePickerFormat.Short,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            var lblFrom = new Label
+            {
+                Text = "From",
+                Location = new Point(filterCard.Padding.Left, _cmbReportType.Bottom + 5),
+                Font = ThemeManager.FontCaption,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _dtpToDate = new DateTimePicker
+            {
+                Location = new Point(filterCard.Padding.Left + 280, _cmbReportType.Bottom + 16),
+                Size = new Size(240, 30),
+                Format = DateTimePickerFormat.Short,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            var lblTo = new Label
+            {
+                Text = "To",
+                Location = new Point(filterCard.Padding.Left + 280, _cmbReportType.Bottom + 5),
+                Font = ThemeManager.FontCaption,
+                ForeColor = ThemeManager.MutedText
+            };
 
             _cmbPaymentStatus = new ComboBox
             {
-                Location = new Point(20, 130),
-                Width = 150,
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Location = new Point(filterCard.Padding.Left, _dtpToDate.Bottom + 20),
+                Size = new Size(260, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                ForeColor = ThemeManager.MutedText
             };
-            _cmbPaymentStatus.Items.AddRange(new object[] { "All", "Paid", "Pending" });
-            _cmbPaymentStatus.SelectedIndex = 0;
 
-            Button btnLoad = new RoundedButton { Text = "Load Report", Location = new Point(20, 170), Width = 120, CornerRadius = 6 };
+            var lblPaymentStatus = new Label
+            {
+                Text = "Payment Status",
+                Location = new Point(filterCard.Padding.Left, _dtpToDate.Bottom + 16),
+                Font = ThemeManager.FontCaption,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            var btnLoad = UIStyleKit.CreateButton(ButtonStyle.Primary, "Load Report", 120, 36);
+            btnLoad.Location = new Point(filterCard.Padding.Left, _cmbPaymentStatus.Bottom + 20);
             btnLoad.Click += BtnLoad_Click;
+            filterCard.Controls.Add(_cmbReportType);
+            filterCard.Controls.Add(_dtpFromDate);
+            filterCard.Controls.Add(lblFrom);
+            filterCard.Controls.Add(_dtpToDate);
+            filterCard.Controls.Add(lblTo);
+            filterCard.Controls.Add(_cmbPaymentStatus);
+            filterCard.Controls.Add(lblPaymentStatus);
+            filterCard.Controls.Add(btnLoad);
 
-            _txtSearch = new TextBox { Location = new Point(160, 170), Width = 180 };
+            // Stats cards row
+            var statsPanel = new Panel
+            {
+                Location = new Point(20, 280),
+                Size = new Size(520, 50),
+                BackColor = Color.Transparent
+            };
 
+            var revenueCard = UIStyleKit.CreateStatCard("Revenue", "0.00", IconHelper.Glyphs.Info, ThemeManager.Primary, 180, 40);
+            revenueCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(revenueCard);
+
+            var profitCard = UIStyleKit.CreateStatCard("Profit", "0.00", IconHelper.Glyphs.Success, ThemeManager.Success, 180, 40);
+            profitCard.Location = new Point(210, 10);
+            statsPanel.Controls.Add(profitCard);
+
+            // Grid area
             _grid = new DataGridView
             {
-                Location = new Point(20, 250),
+                Location = new Point(20, 340),
                 Size = new Size(500, 300),
                 ReadOnly = true,
                 AutoGenerateColumns = false,
@@ -100,20 +183,16 @@ namespace Super_Shop_Management_System.Forms
                 AllowUserToAddRows = false
             };
 
-DataGridStyler.ApplyModernStyle(_grid);
+            DataGridStyler.ApplyModernStyle(_grid);
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ReportName", HeaderText = "Report", Width = 200 });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Period", HeaderText = "Period", Width = 150 });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "TotalSales", HeaderText = "Total Sales", Width = 120 });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "TotalProfit", HeaderText = "Total Profit", Width = 120 });
+            _grid.SelectionChanged += Grid_SelectionChanged;
 
-            Controls.Add(title);
-            Controls.Add(panel);
-            panel.Controls.Add(_cmbReportType);
-            panel.Controls.Add(new Label { Text = "Report Type", Location = new Point(20, 20), AutoSize = true });
-            panel.Controls.Add(_dtpFromDate);
-            panel.Controls.Add(new Label { Text = "From", Location = new Point(20, 70), AutoSize = true });
-            panel.Controls.Add(_dtpToDate);
-            panel.Controls.Add(new Label { Text = "To", Location = new Point(240, 70), AutoSize = true });
-            panel.Controls.Add(_cmbPaymentStatus);
-            panel.Controls.Add(new Label { Text = "Payment Status", Location = new Point(20, 110), AutoSize = true });
-            panel.Controls.Add(btnLoad);
-            panel.Controls.Add(_txtSearch);
+            Controls.Add(headerPanel);
+            Controls.Add(filterCard);
+            Controls.Add(statsPanel);
             Controls.Add(_grid);
         }
 
@@ -165,6 +244,14 @@ DataGridStyler.ApplyModernStyle(_grid);
                 {
                     MessageBox.Show($"Unable to load report: {ex.Message}", "Report", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+            }
+        }
+
+        private void Grid_SelectionChanged(object sender, EventArgs e)
+        {
+            if (!(_grid.CurrentRow?.DataBoundItem is null))
+            {
+                // Selection changed handling can be added here
             }
         }
     }

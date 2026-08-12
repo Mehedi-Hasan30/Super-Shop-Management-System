@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
-using Super_Shop_Management_System.Models;
-using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -54,12 +52,12 @@ private void InitializeComponent()
             var headerPanel = new Panel
             {
                 Location = new Point(0, 0),
-                Size = new Size(1360, 80),
+                Size = new Size(1200, 80),
                 BackColor = ThemeManager.Sidebar,
                 Padding = new Padding(0)
             };
 
-var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeManager.Primary);
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeManager.Primary);
             iconLabel.Location = new Point(20, 20);
             headerPanel.Controls.Add(iconLabel);
 
@@ -81,30 +79,29 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             };
             headerPanel.Controls.Add(separator);
 
-            // Search and stats row
+            // Search panel card
             var searchPanel = new RoundedPanel
             {
                 Location = new Point(20, 90),
-                Size = new Size(1320, 50),
+                Size = new Size(1160, 50),
                 BorderColor = ThemeManager.BorderColor,
                 Padding = new Padding(12)
             };
 
             _txtSearch = new TextBox
-{
-    Text = "",
-    Location = new Point(searchPanel.Padding.Left, 10),
-    Size = new Size(1176, 30),
-    BorderStyle = BorderStyle.None,
-    Font = ThemeManager.FontBody,
-    ForeColor = ThemeManager.MutedText
-};
+            {
+                Text = "",
+                Location = new Point(searchPanel.Padding.Left, 10),
+                Size = new Size(920, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
             _txtSearch.TextChanged += async (_, __) => await LoadProductsAsync(_txtSearch.Text);
             searchPanel.Controls.Add(_txtSearch);
 
-            // Add product button
             var btnAddProduct = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add Product", 120, 36);
-            btnAddProduct.Location = new Point(searchPanel.Padding.Left + 10 + 1176 - 120, 10);
+            btnAddProduct.Location = new Point(searchPanel.Padding.Left + 930, 10);
             btnAddProduct.Click += BtnAddToCart_Click;
             searchPanel.Controls.Add(btnAddProduct);
 
@@ -112,7 +109,7 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             var statsPanel = new Panel
             {
                 Location = new Point(20, 150),
-                Size = new Size(1320, 60),
+                Size = new Size(1160, 60),
                 BackColor = Color.Transparent
             };
 
@@ -131,7 +128,7 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             vatCard.Location = new Point(440, 10);
             statsPanel.Controls.Add(vatCard);
 
-            // Grid area - Products
+            // Grid area - Products (left)
             _gridProducts = new DataGridView
             {
                 Location = new Point(20, 220),
@@ -149,7 +146,7 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Barcode", HeaderText = "Barcode", Width = 120 });
             _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SellingPrice", HeaderText = "Price", Width = 90 });
 
-            // Grid area - Cart
+            // Grid area - Cart (middle)
             _gridCart = new DataGridView
             {
                 Location = new Point(500, 220),
@@ -191,15 +188,15 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             var rightPanel = new Panel
             {
                 Location = new Point(940, 220),
-                Size = new Size(400, 350),
+                Size = new Size(240, 350),
                 BackColor = ThemeManager.PanelBackground,
                 Padding = new Padding(16)
             };
 
-            _numDiscount = new NumericUpDown { Location = new Point(16, 20), Width = 260, DecimalPlaces = 2, Maximum = 999999999, Minimum = 0 };
+            _numDiscount = new NumericUpDown { Location = new Point(16, 20), Width = 220, DecimalPlaces = 2, Maximum = 999999999, Minimum = 0 };
             _numDiscount.ValueChanged += (_, __) => RefreshSummary();
 
-            _numVat = new NumericUpDown { Location = new Point(16, 70), Width = 260, DecimalPlaces = 2, Maximum = 100, Minimum = 0, Value = 5 };
+            _numVat = new NumericUpDown { Location = new Point(16, 70), Width = 220, DecimalPlaces = 2, Maximum = 100, Minimum = 0, Value = 5 };
             _numVat.ValueChanged += (_, __) => RefreshSummary();
 
             _lblCartTotal = new Label { Location = new Point(16, 120), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
@@ -210,7 +207,7 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             _cmbPaymentMethod = new ComboBox
             {
                 Location = new Point(16, 250),
-                Width = 260,
+                Width = 220,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbPaymentMethod.Items.AddRange(new object[] { "Cash", "Card", "Mobile Banking" });
@@ -221,7 +218,7 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             _cmbPaymentStatus = new ComboBox
             {
                 Location = new Point(16, 310),
-                Width = 260,
+                Width = 220,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbPaymentStatus.Items.AddRange(new object[] { "Paid", "Pending" });
@@ -232,7 +229,7 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             _numPaymentAmount = new NumericUpDown
             {
                 Location = new Point(16, 370),
-                Width = 260,
+                Width = 220,
                 DecimalPlaces = 2,
                 Maximum = 999999999,
                 Minimum = 0,
@@ -242,8 +239,8 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
 
             _lblChange = new Label { Location = new Point(16, 410), AutoSize = true, Font = new Font("Segoe UI", 9, FontStyle.Bold) };
 
-            var btnCheckout = UIStyleKit.CreateButton(ButtonStyle.Primary, "Checkout (Phase 3.2.1)", 280, 40);
-            btnCheckout.Location = new Point(60, 440);
+            var btnCheckout = UIStyleKit.CreateButton(ButtonStyle.Primary, "Checkout", 200, 40);
+            btnCheckout.Location = new Point(20, 440);
             btnCheckout.Click += BtnCheckout_ClickAsync;
 
             rightPanel.Controls.Add(_numDiscount);
@@ -252,7 +249,6 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             rightPanel.Controls.Add(_lblDiscount);
             rightPanel.Controls.Add(new Label { Text = "VAT (%)", Location = new Point(16, 75), AutoSize = true });
             rightPanel.Controls.Add(_numVat);
-            rightPanel.Controls.Add(_lblVat);
             rightPanel.Controls.Add(_lblGrandTotal);
             rightPanel.Controls.Add(btnCheckout);
             rightPanel.Controls.Add(_lblPaymentStatus);
@@ -267,7 +263,6 @@ var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeMa
             Controls.Add(headerPanel);
             Controls.Add(searchPanel);
             Controls.Add(statsPanel);
-            Controls.Add(cartActionsPanel);
             Controls.Add(_gridProducts);
             Controls.Add(_gridCart);
             Controls.Add(rightPanel);

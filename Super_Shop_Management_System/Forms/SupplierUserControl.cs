@@ -33,46 +33,139 @@ namespace Super_Shop_Management_System.Forms
 
         private void InitializeComponent()
         {
+            // Premium header panel
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, 0),
+                Size = new Size(560, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Suppliers, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
             var title = new Label
             {
                 Text = "Supplier Management",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            var panel = new Panel
+            var separator = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(500, 200),
-                BackColor = ThemeManager.PanelBackground,
-                Padding = new Padding(12)
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Input panel card
+            var inputCard = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(520, 160),
+                BorderColor = ThemeManager.BorderColor,
+                Padding = new Padding(16)
             };
 
-            _txtName = new TextBox { Location = new Point(20, 40), Width = 300 };
-            _txtCompany = new TextBox { Location = new Point(20, 90), Width = 300 };
-            _txtPhone = new TextBox { Location = new Point(340, 40), Width = 150 };
-            _txtEmail = new TextBox { Location = new Point(340, 90), Width = 150 };
-            _txtAddress = new TextBox { Location = new Point(20, 140), Width = 470 };
-            _txtProductType = new TextBox { Location = new Point(340, 140), Width = 150 };
-            _txtSearch = new TextBox { Location = new Point(20, 170), Width = 300 };
+            _txtName = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, inputCard.Padding.Top),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
 
-            Button btnAdd = new RoundedButton { Text = "Add", Location = new Point(20, 200), Width = 80, CornerRadius = 6 };
+            _txtCompany = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtName.Bottom + 12),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtPhone = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtCompany.Bottom + 12),
+                Size = new Size(130, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtEmail = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left + 150, _txtCompany.Bottom + 12),
+                Size = new Size(150, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtAddress = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtEmail.Bottom + 20),
+                Size = new Size(490, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtProductType = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtAddress.Bottom + 12),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            var btnAdd = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add", 80, 36);
+            btnAdd.Location = new Point(inputCard.Padding.Left, 20);
             btnAdd.Click += BtnAdd_Click;
+            inputCard.Controls.Add(_txtName);
+            inputCard.Controls.Add(_txtCompany);
+            inputCard.Controls.Add(_txtPhone);
+            inputCard.Controls.Add(_txtEmail);
+            inputCard.Controls.Add(_txtAddress);
+            inputCard.Controls.Add(_txtProductType);
+            inputCard.Controls.Add(btnAdd);
 
-            Button btnUpdate = new RoundedButton { Text = "Update", Location = new Point(120, 200), Width = 80, CornerRadius = 6 };
+            var btnUpdate = UIStyleKit.CreateButton(ButtonStyle.Secondary, "Update", 80, 36);
+            btnUpdate.Location = new Point(inputCard.Padding.Left + 100, 20);
             btnUpdate.Click += BtnUpdate_Click;
 
-            Button btnDelete = new RoundedButton { Text = "Delete", Location = new Point(220, 200), Width = 80, CornerRadius = 6 };
+            var btnDelete = UIStyleKit.CreateButton(ButtonStyle.Danger, "Delete", 80, 36);
+            btnDelete.Location = new Point(inputCard.Padding.Left + 200, 20);
             btnDelete.Click += BtnDelete_Click;
 
-            _txtSearch.TextChanged += async (_, __) => await LoadSuppliersAsync();
+            // Stats cards row
+            var statsPanel = new Panel
+            {
+                Location = new Point(20, 260),
+                Size = new Size(520, 50),
+                BackColor = Color.Transparent
+            };
 
+            var totalCard = UIStyleKit.CreateStatCard("Suppliers", "0", IconHelper.Glyphs.Suppliers, ThemeManager.Success, 180, 40);
+            totalCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(totalCard);
+
+            var activeCard = UIStyleKit.CreateStatCard("Active", "0", IconHelper.Glyphs.Suppliers, ThemeManager.Primary, 180, 40);
+            activeCard.Location = new Point(210, 10);
+            statsPanel.Controls.Add(activeCard);
+
+            // Grid area
             _grid = new DataGridView
             {
-                Location = new Point(20, 250),
+                Location = new Point(20, 320),
                 Size = new Size(500, 300),
                 ReadOnly = true,
                 AutoGenerateColumns = false,
@@ -81,7 +174,7 @@ namespace Super_Shop_Management_System.Forms
                 AllowUserToAddRows = false
             };
 
-DataGridStyler.ApplyModernStyle(_grid);
+            DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SupplierID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SupplierName", HeaderText = "Supplier Name", Width = 200 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CompanyName", HeaderText = "Company Name", Width = 150 });
@@ -91,8 +184,9 @@ DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductType", HeaderText = "Product Type", Width = 130 });
             _grid.SelectionChanged += Grid_SelectionChanged;
 
-            Controls.Add(title);
-            Controls.Add(panel);
+            Controls.Add(headerPanel);
+            Controls.Add(inputCard);
+            Controls.Add(statsPanel);
             Controls.Add(_grid);
         }
 

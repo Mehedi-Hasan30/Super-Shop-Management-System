@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
-using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -39,51 +38,178 @@ namespace Super_Shop_Management_System.Forms
 
         private void InitializeComponent()
         {
+            // Premium header panel
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, 0),
+                Size = new Size(560, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Employees, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
             var title = new Label
             {
                 Text = "Employee Management",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            var panel = new Panel
+            var separator = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(500, 220),
-                BackColor = ThemeManager.PanelBackground,
-                Padding = new Padding(12)
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Input panel card
+            var inputCard = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(520, 220),
+                BorderColor = ThemeManager.BorderColor,
+                Padding = new Padding(16)
             };
 
-            _txtFullName = new TextBox { Location = new Point(20, 40), Width = 300 };
-            _txtUsername = new TextBox { Location = new Point(20, 90), Width = 300 };
-            _txtPassword = new TextBox { Location = new Point(20, 140), Width = 300, UseSystemPasswordChar = true };
-            _chkSetPassword = new CheckBox { Text = "Set password", Location = new Point(20, 165), AutoSize = true };
-            _txtPhone = new TextBox { Location = new Point(340, 40), Width = 150 };
-            _txtEmail = new TextBox { Location = new Point(340, 90), Width = 150 };
-            _txtAddress = new TextBox { Location = new Point(20, 190), Width = 470 };
-            _txtRole = new TextBox { Location = new Point(20, 90), Width = 150 };
-            _numSalary = new NumericUpDown { Location = new Point(340, 90), Width = 150, Maximum = 999999999, Minimum = 0 };
-            _txtShift = new TextBox { Location = new Point(20, 140), Width = 150 };
-            _dtpJoinDate = new DateTimePicker { Location = new Point(340, 140), Width = 150, Format = DateTimePickerFormat.Short };
-            _txtSearch = new TextBox { Location = new Point(20, 180), Width = 300 };
+            _txtFullName = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, inputCard.Padding.Top),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
 
-            Button btnAdd = new RoundedButton { Text = "Add", Location = new Point(20, 210), Width = 80, CornerRadius = 6 };
+            _txtUsername = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtFullName.Bottom + 12),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtPhone = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left + 260 + 16, _txtFullName.Top),
+                Size = new Size(130, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtEmail = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left + 260 + 16, _txtUsername.Bottom + 12),
+                Size = new Size(150, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtAddress = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtEmail.Bottom + 20),
+                Size = new Size(490, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtRole = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtPhone.Bottom + 12),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _numSalary = new NumericUpDown
+            {
+                Location = new Point(inputCard.Padding.Left + 260 + 16, _txtEmail.Bottom + 12),
+                Size = new Size(150, 30),
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtShift = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtRole.Bottom + 12),
+                Size = new Size(150, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _dtpJoinDate = new DateTimePicker
+            {
+                Location = new Point(inputCard.Padding.Left + 260 + 16, _txtRole.Bottom + 12),
+                Size = new Size(150, 30),
+                Format = DateTimePickerFormat.Short,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            _txtPassword = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtShift.Bottom + 12),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText,
+                UseSystemPasswordChar = true
+            };
+
+            var btnAdd = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add", 80, 36);
+            btnAdd.Location = new Point(inputCard.Padding.Left, 20);
             btnAdd.Click += BtnAdd_Click;
+            inputCard.Controls.Add(_txtFullName);
+            inputCard.Controls.Add(_txtUsername);
+            inputCard.Controls.Add(_txtPhone);
+            inputCard.Controls.Add(_txtEmail);
+            inputCard.Controls.Add(_txtAddress);
+            inputCard.Controls.Add(_txtRole);
+            inputCard.Controls.Add(_numSalary);
+            inputCard.Controls.Add(_txtShift);
+            inputCard.Controls.Add(_dtpJoinDate);
+            inputCard.Controls.Add(_txtPassword);
+            inputCard.Controls.Add(btnAdd);
 
-            Button btnUpdate = new RoundedButton { Text = "Update", Location = new Point(120, 210), Width = 80, CornerRadius = 6 };
+            var btnUpdate = UIStyleKit.CreateButton(ButtonStyle.Secondary, "Update", 80, 36);
+            btnUpdate.Location = new Point(inputCard.Padding.Left + 100, 20);
             btnUpdate.Click += BtnUpdate_Click;
 
-            Button btnDelete = new RoundedButton { Text = "Delete", Location = new Point(220, 210), Width = 80, CornerRadius = 6 };
+            var btnDelete = UIStyleKit.CreateButton(ButtonStyle.Danger, "Delete", 80, 36);
+            btnDelete.Location = new Point(inputCard.Padding.Left + 200, 20);
             btnDelete.Click += BtnDelete_Click;
 
-            _txtSearch.TextChanged += async (_, __) => await LoadEmployeesAsync();
+            // Stats cards row
+            var statsPanel = new Panel
+            {
+                Location = new Point(20, 320),
+                Size = new Size(520, 50),
+                BackColor = Color.Transparent
+            };
 
+            var totalCard = UIStyleKit.CreateStatCard("Employees", "0", IconHelper.Glyphs.Employees, ThemeManager.Info, 180, 40);
+            totalCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(totalCard);
+
+            var activeCard = UIStyleKit.CreateStatCard("Active", "0", IconHelper.Glyphs.Employees, ThemeManager.Primary, 180, 40);
+            activeCard.Location = new Point(210, 10);
+            statsPanel.Controls.Add(activeCard);
+
+            // Grid area
             _grid = new DataGridView
             {
-                Location = new Point(20, 240),
+                Location = new Point(20, 380),
                 Size = new Size(500, 300),
                 ReadOnly = true,
                 AutoGenerateColumns = false,
@@ -92,7 +218,7 @@ namespace Super_Shop_Management_System.Forms
                 AllowUserToAddRows = false
             };
 
-DataGridStyler.ApplyModernStyle(_grid);
+            DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "EmployeeID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "FullName", HeaderText = "Full Name", Width = 150 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Username", HeaderText = "Username", Width = 100 });
@@ -101,8 +227,9 @@ DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Shift", HeaderText = "Shift", Width = 80 });
             _grid.SelectionChanged += Grid_SelectionChanged;
 
-            Controls.Add(title);
-            Controls.Add(panel);
+            Controls.Add(headerPanel);
+            Controls.Add(inputCard);
+            Controls.Add(statsPanel);
             Controls.Add(_grid);
         }
 
