@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Animations;
@@ -14,6 +15,7 @@ namespace Super_Shop_Management_System.Forms
         private readonly FlowLayoutPanel _flow;
         private readonly RoundedButton _toggleButton;
         private bool _isCollapsed;
+        private string _lastSelectedModule = "";
         private const int CollapsedWidth = 60;
         private const int ExpandedWidth = 240;
 
@@ -142,6 +144,7 @@ namespace Super_Shop_Management_System.Forms
 
             Color normal = ThemeManager.Sidebar;
             Color hover = ThemeManager.SidebarButtonHover;
+            Color selected = ThemeManager.Primary;  // Active selection color
             btn.MouseEnter += (s, e) =>
             {
                 if (!_isCollapsed && btn.Enabled)
@@ -154,11 +157,26 @@ namespace Super_Shop_Management_System.Forms
             {
                 if (!_isCollapsed && btn.Enabled)
                 {
-                    btn.BackColor = normal;
+                    // Restore normal or selected color
+                    btn.BackColor = _lastSelectedModule == moduleName ? selected : normal;
                     btn.Invalidate();
                 }
             };
-            btn.Click += (s, e) => { NavButtonClicked?.Invoke(this, moduleName); };
+            // Add click handler with selection tracking
+            btn.Click += (s, e) =>
+            {
+                _lastSelectedModule = moduleName;
+                NavButtonClicked?.Invoke(this, moduleName);
+                // Visual feedback: briefly change to selected color then revert
+                var originalColor = btn.BackColor;
+                btn.BackColor = selected;
+                btn.Invalidate();
+                Task.Delay(150).ContinueWith(_ =>
+                {
+                    if (btn.InvokeRequired) btn.Invoke((MethodInvoker)(() => btn.BackColor = originalColor));
+                    else btn.BackColor = originalColor;
+                });
+            };
 
             _flow.Controls.Add(btn);
         }

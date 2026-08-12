@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
+using Super_Shop_Management_System.Models;
 using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
@@ -47,146 +48,191 @@ namespace Super_Shop_Management_System.Forms
             Load += SalesUserControl_Load;
         }
 
-        private void InitializeComponent()
+private void InitializeComponent()
         {
+            // Premium header panel
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, 0),
+                Size = new Size(1360, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Sales, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
             var title = new Label
             {
                 Text = "POS Sales",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            // Left panel - Product search and grid
-            var leftPanel = new Panel
+            var separator = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(520, 550),
-                BackColor = ThemeManager.PanelBackground,
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Search and stats row
+            var searchPanel = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(1320, 50),
+                BorderColor = ThemeManager.BorderColor,
                 Padding = new Padding(12)
             };
 
-            _txtSearch = new TextBox { Location = new Point(12, 30), Width = 300 };
+            _txtSearch = new TextBox
+{
+    Text = "",
+    Location = new Point(searchPanel.Padding.Left, 10),
+    Size = new Size(1176, 30),
+    BorderStyle = BorderStyle.None,
+    Font = ThemeManager.FontBody,
+    ForeColor = ThemeManager.MutedText
+};
             _txtSearch.TextChanged += async (_, __) => await LoadProductsAsync(_txtSearch.Text);
+            searchPanel.Controls.Add(_txtSearch);
 
-            Button btnSearch = new RoundedButton { Text = "Search", Location = new Point(320, 28), Width = 80, CornerRadius = 6 };
-            btnSearch.Click += async (_, __) => await LoadProductsAsync(_txtSearch.Text);
+            // Add product button
+            var btnAddProduct = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add Product", 120, 36);
+            btnAddProduct.Location = new Point(searchPanel.Padding.Left + 10 + 1176 - 120, 10);
+            btnAddProduct.Click += BtnAddToCart_Click;
+            searchPanel.Controls.Add(btnAddProduct);
 
-            _lblBarcode = new Label { Text = "Barcode (Scanner)", Location = new Point(12, 55), AutoSize = true };
-            _txtBarcode = new TextBox { Location = new Point(12, 75), Width = 300 };
-            _txtBarcode.KeyDown += TxtBarcode_KeyDown;
-
-_gridProducts = new DataGridView
-                {
-                    Location = new Point(12, 105),
-                    Size = new Size(460, 400),
-                    ReadOnly = true,
-                    AutoGenerateColumns = false,
-                    SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                    MultiSelect = false,
-                    AllowUserToAddRows = false
-                };
-
-DataGridStyler.ApplyModernStyle(_gridProducts);
-            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductID", HeaderText = "ID", Width = 50 });
-            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Product", Width = 180 });
-            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Barcode", HeaderText = "Barcode", Width = 120 });
-            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SellingPrice", HeaderText = "Price", Width = 90 });
-
-            leftPanel.Controls.Add(_lblBarcode);
-            leftPanel.Controls.Add(_txtBarcode);
-            leftPanel.Controls.Add(_gridProducts);
-            leftPanel.Controls.Add(_txtSearch);
-            leftPanel.Controls.Add(btnSearch);
-
-            // Center panel - Cart
-            var centerPanel = new Panel
+            // KPI stats cards row
+            var statsPanel = new Panel
             {
-                Location = new Point(560, 60),
-                Size = new Size(520, 550),
-                BackColor = ThemeManager.PanelBackground,
-                Padding = new Padding(12)
+                Location = new Point(20, 150),
+                Size = new Size(1320, 60),
+                BackColor = Color.Transparent
             };
 
-            _gridCart = new DataGridView
+            // Cart total stat
+            var cartTotalCard = UIStyleKit.CreateStatCard("Cart Total", "0.00", IconHelper.Glyphs.Sales, ThemeManager.Primary, 200, 50);
+            cartTotalCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(cartTotalCard);
+
+            // Discount stat
+            var discountCard = UIStyleKit.CreateStatCard("Discount", "0.00", IconHelper.Glyphs.Alert, ThemeManager.Warning, 200, 50);
+            discountCard.Location = new Point(230, 10);
+            statsPanel.Controls.Add(discountCard);
+
+            // VAT stat
+            var vatCard = UIStyleKit.CreateStatCard("VAT", "0%", IconHelper.Glyphs.Info, ThemeManager.Info, 200, 50);
+            vatCard.Location = new Point(440, 10);
+            statsPanel.Controls.Add(vatCard);
+
+            // Grid area - Products
+            _gridProducts = new DataGridView
             {
-                Size = new Size(490, 300),
+                Location = new Point(20, 220),
+                Size = new Size(460, 400),
                 ReadOnly = true,
                 AutoGenerateColumns = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
                 AllowUserToAddRows = false
             };
+
+            DataGridStyler.ApplyModernStyle(_gridProducts);
+            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductID", HeaderText = "ID", Width = 50 });
+            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Product", Width = 180 });
+            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Barcode", HeaderText = "Barcode", Width = 120 });
+            _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SellingPrice", HeaderText = "Price", Width = 90 });
+
+            // Grid area - Cart
+            _gridCart = new DataGridView
+            {
+                Location = new Point(500, 220),
+                Size = new Size(420, 300),
+                ReadOnly = true,
+                AutoGenerateColumns = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                MultiSelect = false,
+                AllowUserToAddRows = false
+            };
+
+            DataGridStyler.ApplyModernStyle(_gridCart);
             _gridCart.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Product", Width = 220 });
             _gridCart.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Quantity", HeaderText = "Qty", Width = 80 });
             _gridCart.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "UnitPrice", HeaderText = "Unit Price", Width = 120 });
             _gridCart.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "SubTotal", HeaderText = "Sub Total", Width = 140 });
 
-            _numQuantity = new NumericUpDown { Location = new Point(12, 645), Width = 120, Minimum = 1, Maximum = 10000, Value = 1 };
-            Button btnAddToCart = new RoundedButton { Text = "Add To Cart", Location = new Point(145, 642), Width = 140, CornerRadius = 6 };
-            btnAddToCart.Click += BtnAddToCart_Click;
+            // Cart actions panel
+            var cartActionsPanel = new Panel
+            {
+                Location = new Point(500, 530),
+                Size = new Size(420, 50),
+                BackColor = Color.Transparent
+            };
 
-            Button btnRemove = new RoundedButton { Text = "Remove", Location = new Point(12, 630), Width = 110, CornerRadius = 6 };
-            btnRemove.Click += BtnRemove_Click;
+            var btnAddToCart = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add to Cart", 140, 36);
+            btnAddToCart.Location = new Point(10, 5);
+            cartActionsPanel.Controls.Add(btnAddToCart);
 
-            Button btnClear = new RoundedButton { Text = "Clear Cart", Location = new Point(130, 630), Width = 110, CornerRadius = 6 };
-            btnClear.Click += (_, __) => { _posService.ClearCart(); RefreshCart(); };
+            var btnRemove = UIStyleKit.CreateButton(ButtonStyle.Danger, "Remove", 100, 36);
+            btnRemove.Location = new Point(160, 5);
+            cartActionsPanel.Controls.Add(btnRemove);
 
-            centerPanel.Controls.Add(_gridCart);
-            centerPanel.Controls.Add(btnRemove);
-            centerPanel.Controls.Add(btnClear);
-            centerPanel.Controls.Add(_numQuantity);
-            centerPanel.Controls.Add(btnAddToCart);
-            centerPanel.Controls.Add(new Label { Text = "Quantity", Location = new Point(12, 625), AutoSize = true });
+            var btnClearCart = UIStyleKit.CreateButton(ButtonStyle.Secondary, "Clear Cart", 100, 36);
+            btnClearCart.Location = new Point(270, 5);
+            cartActionsPanel.Controls.Add(btnClearCart);
 
             // Right panel - Payment summary
             var rightPanel = new Panel
             {
-                Location = new Point(1100, 60),
-                Size = new Size(320, 550),
+                Location = new Point(940, 220),
+                Size = new Size(400, 350),
                 BackColor = ThemeManager.PanelBackground,
-                Padding = new Padding(12)
+                Padding = new Padding(16)
             };
 
-            _numDiscount = new NumericUpDown { Location = new Point(12, 170), Width = 280, DecimalPlaces = 2, Maximum = 999999999, Minimum = 0 };
+            _numDiscount = new NumericUpDown { Location = new Point(16, 20), Width = 260, DecimalPlaces = 2, Maximum = 999999999, Minimum = 0 };
             _numDiscount.ValueChanged += (_, __) => RefreshSummary();
 
-            _numVat = new NumericUpDown { Location = new Point(12, 235), Width = 280, DecimalPlaces = 2, Maximum = 100, Minimum = 0, Value = 5 };
+            _numVat = new NumericUpDown { Location = new Point(16, 70), Width = 260, DecimalPlaces = 2, Maximum = 100, Minimum = 0, Value = 5 };
             _numVat.ValueChanged += (_, __) => RefreshSummary();
 
-            _lblCartTotal = new Label { Location = new Point(12, 340), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
-            _lblDiscount = new Label { Location = new Point(12, 370), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
-            _lblVat = new Label { Location = new Point(12, 400), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
-            _lblGrandTotal = new Label { Location = new Point(12, 430), AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = ThemeManager.Primary };
+            _lblCartTotal = new Label { Location = new Point(16, 120), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
+            _lblDiscount = new Label { Location = new Point(16, 150), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
+            _lblVat = new Label { Location = new Point(16, 180), AutoSize = true, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
+            _lblGrandTotal = new Label { Location = new Point(16, 210), AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = ThemeManager.Primary };
 
             _cmbPaymentMethod = new ComboBox
             {
-                Location = new Point(12, 80),
-                Width = 280,
+                Location = new Point(16, 250),
+                Width = 260,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbPaymentMethod.Items.AddRange(new object[] { "Cash", "Card", "Mobile Banking" });
             _cmbPaymentMethod.SelectedIndex = -1;
             _cmbPaymentMethod.SelectedIndexChanged += (_, __) => RefreshPaymentUi();
 
-            _lblPaymentStatus = new Label { Text = "Payment Status", Location = new Point(12, 125), AutoSize = true };
+            _lblPaymentStatus = new Label { Location = new Point(16, 290), AutoSize = true };
             _cmbPaymentStatus = new ComboBox
             {
-                Location = new Point(12, 145),
-                Width = 280,
+                Location = new Point(16, 310),
+                Width = 260,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbPaymentStatus.Items.AddRange(new object[] { "Paid", "Pending" });
             _cmbPaymentStatus.SelectedIndex = 0;
             _cmbPaymentStatus.SelectedIndexChanged += (_, __) => RefreshPaymentUi();
 
-            _lblPaymentAmount = new Label { Text = "Payment Amount", Location = new Point(12, 170), AutoSize = true };
+            _lblPaymentAmount = new Label { Location = new Point(16, 350), AutoSize = true };
             _numPaymentAmount = new NumericUpDown
             {
-                Location = new Point(12, 190),
-                Width = 280,
+                Location = new Point(16, 370),
+                Width = 260,
                 DecimalPlaces = 2,
                 Maximum = 999999999,
                 Minimum = 0,
@@ -194,30 +240,36 @@ DataGridStyler.ApplyModernStyle(_gridProducts);
             };
             _numPaymentAmount.ValueChanged += (_, __) => RefreshPaymentUi();
 
-            _lblChange = new Label { Text = "Change: -", Location = new Point(12, 215), AutoSize = true, Font = new Font("Segoe UI", 9, FontStyle.Bold) };
+            _lblChange = new Label { Location = new Point(16, 410), AutoSize = true, Font = new Font("Segoe UI", 9, FontStyle.Bold) };
 
-            Button btnCheckout = new RoundedButton { Text = "Checkout", Location = new Point(12, 470), Width = 280, Height = 40, CornerRadius = 6 };
+            var btnCheckout = UIStyleKit.CreateButton(ButtonStyle.Primary, "Checkout (Phase 3.2.1)", 280, 40);
+            btnCheckout.Location = new Point(60, 440);
             btnCheckout.Click += BtnCheckout_ClickAsync;
 
-            rightPanel.Controls.Add(_cmbPaymentMethod);
-            rightPanel.Controls.Add(new Label { Text = "Payment Method", Location = new Point(12, 80), AutoSize = true });
-            rightPanel.Controls.Add(_lblPaymentStatus);
-            rightPanel.Controls.Add(_cmbPaymentStatus);
-            rightPanel.Controls.Add(_lblPaymentAmount);
-            rightPanel.Controls.Add(_numPaymentAmount);
-            rightPanel.Controls.Add(_lblChange);
-            rightPanel.Controls.Add(btnCheckout);
-            rightPanel.Controls.Add(new Label { Text = "Discount Amount", Location = new Point(12, 250), AutoSize = true });
             rightPanel.Controls.Add(_numDiscount);
-            rightPanel.Controls.Add(new Label { Text = "VAT (%)", Location = new Point(12, 300), AutoSize = true });
-            rightPanel.Controls.Add(_numVat);
+            rightPanel.Controls.Add(new Label { Text = "Discount Amount", Location = new Point(16, 5), AutoSize = true });
             rightPanel.Controls.Add(_lblCartTotal);
             rightPanel.Controls.Add(_lblDiscount);
+            rightPanel.Controls.Add(new Label { Text = "VAT (%)", Location = new Point(16, 75), AutoSize = true });
+            rightPanel.Controls.Add(_numVat);
             rightPanel.Controls.Add(_lblVat);
             rightPanel.Controls.Add(_lblGrandTotal);
+            rightPanel.Controls.Add(btnCheckout);
+            rightPanel.Controls.Add(_lblPaymentStatus);
+            rightPanel.Controls.Add(_cmbPaymentStatus);
+            rightPanel.Controls.Add(new Label { Text = "Payment Status", Location = new Point(16, 285), AutoSize = true });
+            rightPanel.Controls.Add(_lblPaymentAmount);
+            rightPanel.Controls.Add(_numPaymentAmount);
+            rightPanel.Controls.Add(new Label { Text = "Payment Amount", Location = new Point(16, 355), AutoSize = true });
+            rightPanel.Controls.Add(_numPaymentAmount);
+            rightPanel.Controls.Add(_lblChange);
 
-            Controls.Add(leftPanel);
-            Controls.Add(centerPanel);
+            Controls.Add(headerPanel);
+            Controls.Add(searchPanel);
+            Controls.Add(statsPanel);
+            Controls.Add(cartActionsPanel);
+            Controls.Add(_gridProducts);
+            Controls.Add(_gridCart);
             Controls.Add(rightPanel);
         }
 

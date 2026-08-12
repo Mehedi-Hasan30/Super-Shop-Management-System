@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
-using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -29,42 +28,87 @@ namespace Super_Shop_Management_System.Forms
 
         private void InitializeComponent()
         {
+            // Premium header panel
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, 0),
+                Size = new Size(560, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Inventory, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
             var title = new Label
             {
                 Text = "Category Management",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            var panel = new Panel
+            var separator = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(500, 180),
-                BackColor = ThemeManager.PanelBackground,
-                Padding = new Padding(12)
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Input panel card
+            var inputCard = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(520, 130),
+                BorderColor = ThemeManager.BorderColor,
+                Padding = new Padding(16)
             };
 
-            _txtName = new TextBox { Location = new Point(20, 40), Width = 300 };
-            _txtDescription = new TextBox { Location = new Point(20, 100), Width = 300 };
+            _txtName = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, inputCard.Padding.Top),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
 
-            Button btnAdd = new RoundedButton { Text = "Add", Location = new Point(20, 140), Width = 80, CornerRadius = 6 };
+            _txtDescription = new TextBox
+            {
+                Location = new Point(inputCard.Padding.Left, _txtName.Bottom + 12),
+                Size = new Size(260, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+
+            var btnAdd = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add", 80, 36);
+            btnAdd.Location = new Point(inputCard.Padding.Left + 260 + 16, 20);
             btnAdd.Click += BtnAdd_Click;
+            inputCard.Controls.Add(_txtName);
+            inputCard.Controls.Add(_txtDescription);
+            inputCard.Controls.Add(btnAdd);
 
-            Button btnUpdate = new RoundedButton { Text = "Update", Location = new Point(120, 140), Width = 80, CornerRadius = 6 };
-            btnUpdate.Click += BtnUpdate_Click;
+            // Stats cards row
+            var statsPanel = new Panel
+            {
+                Location = new Point(20, 230),
+                Size = new Size(520, 50),
+                BackColor = Color.Transparent
+            };
 
-            Button btnDelete = new RoundedButton { Text = "Delete", Location = new Point(220, 140), Width = 80, CornerRadius = 6 };
-            btnDelete.Click += BtnDelete_Click;
+            var categoryCard = UIStyleKit.CreateStatCard("Categories", "0", IconHelper.Glyphs.Inventory, ThemeManager.Primary, 180, 40);
+            categoryCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(categoryCard);
 
-            _txtSearch = new TextBox { Location = new Point(20, 170), Width = 300 };
-            _txtSearch.TextChanged += (_, __) => LoadCategories();
-
+            // Grid area
             _grid = new DataGridView
             {
-                Location = new Point(20, 220),
+                Location = new Point(20, 290),
                 Size = new Size(500, 300),
                 ReadOnly = true,
                 AutoGenerateColumns = false,
@@ -73,14 +117,15 @@ namespace Super_Shop_Management_System.Forms
                 AllowUserToAddRows = false
             };
 
-DataGridStyler.ApplyModernStyle(_grid);
+            DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CategoryID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CategoryName", HeaderText = "Category Name", Width = 200 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Description", HeaderText = "Description", Width = 200 });
             _grid.SelectionChanged += Grid_SelectionChanged;
 
-            Controls.Add(title);
-            Controls.Add(panel);
+            Controls.Add(headerPanel);
+            Controls.Add(inputCard);
+            Controls.Add(statsPanel);
             Controls.Add(_grid);
         }
 

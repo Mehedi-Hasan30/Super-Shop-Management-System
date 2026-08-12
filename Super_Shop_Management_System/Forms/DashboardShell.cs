@@ -83,7 +83,7 @@ namespace Super_Shop_Management_System.Forms
             };
             _content.Controls.Add(roleLabel);
 
-            // KPI animated counter panel
+            // KPI premium cards panel
             var kpiPanel = new Panel
             {
                 Location = new Point(10, roleLabel.Bottom + 14),
@@ -92,9 +92,55 @@ namespace Super_Shop_Management_System.Forms
             };
             _content.Controls.Add(kpiPanel);
 
-            // Initialize KPI animator - animates counter values
-            _kpiAnimator = new ValueAnimator(this, 0, 0, 1500);
-            _kpiAnimator.Start();
+            // Daily Sales card
+            var card1 = UIStyleKit.CreateStatCard("Daily Sales", "0", IconHelper.Glyphs.Sales, ThemeManager.Success, 110, 80);
+            card1.Location = new Point(10, 10);
+            kpiPanel.Controls.Add(card1);
+
+            // Monthly Sales card
+            var card2 = UIStyleKit.CreateStatCard("Monthly Sales", "0", IconHelper.Glyphs.Sales, ThemeManager.Primary, 110, 80);
+            card2.Location = new Point(120, 10);
+            kpiPanel.Controls.Add(card2);
+
+            // Total Products card
+            var card3 = UIStyleKit.CreateStatCard("Total Products", "0", IconHelper.Glyphs.Inventory, ThemeManager.Info, 110, 80);
+            card3.Location = new Point(230, 10);
+            kpiPanel.Controls.Add(card3);
+
+            // Total Categories card
+            var card4 = UIStyleKit.CreateStatCard("Total Categories", "0", IconHelper.Glyphs.Inventory, ThemeManager.Primary, 110, 80);
+            card4.Location = new Point(340, 10);
+            kpiPanel.Controls.Add(card4);
+
+            // Low Stock card
+            var card5 = UIStyleKit.CreateStatCard("Low Stock", "0", IconHelper.Glyphs.Alert, ThemeManager.Warning, 110, 80);
+            card5.Location = new Point(450, 10);
+            kpiPanel.Controls.Add(card5);
+
+            // Total Customers card
+            var card6 = UIStyleKit.CreateStatCard("Total Customers", "0", IconHelper.Glyphs.Customers, ThemeManager.Primary, 110, 80);
+            card6.Location = new Point(560, 10);
+            kpiPanel.Controls.Add(card6);
+
+            // Total Suppliers card
+            var card7 = UIStyleKit.CreateStatCard("Total Suppliers", "0", IconHelper.Glyphs.Suppliers, ThemeManager.Success, 110, 80);
+            card7.Location = new Point(670, 10);
+            kpiPanel.Controls.Add(card7);
+
+            // Total Employees card
+            var card8 = UIStyleKit.CreateStatCard("Total Employees", "0", IconHelper.Glyphs.Employees, ThemeManager.Info, 110, 80);
+            card8.Location = new Point(780, 10);
+            kpiPanel.Controls.Add(card8);
+
+            // Attendance card
+            var card9 = UIStyleKit.CreateStatCard("Attendance", "0", IconHelper.Glyphs.Attendance, ThemeManager.Warning, 110, 80);
+            card9.Location = new Point(890, 10);
+            kpiPanel.Controls.Add(card9);
+
+            // Notifications card
+            var card10 = UIStyleKit.CreateStatCard("Notifications", "0", IconHelper.Glyphs.Info, ThemeManager.Primary, 110, 80);
+            card10.Location = new Point(1000, 10);
+            kpiPanel.Controls.Add(card10);
 
             _moduleContainer = new Panel { Dock = DockStyle.Fill, BackColor = backgroundColor, AutoScroll = true, Padding = new Padding(20) };
             _content.Controls.Add(_moduleContainer);

@@ -33,45 +33,113 @@ namespace Super_Shop_Management_System.Forms
 
         private void InitializeComponent()
         {
+            // Premium header panel with icon and separator
+            var headerPanel = new Panel
+            {
+                Location = new Point(0, 0),
+                Size = new Size(960, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Customers, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
             var title = new Label
             {
                 Text = "Customer Management",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            var panel = new Panel
+            var separator = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(900, 180),
-                BackColor = ThemeManager.PanelBackground,
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Search section card
+            var searchCard = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(920, 50),
+                BorderColor = ThemeManager.BorderColor,
                 Padding = new Padding(12)
             };
 
-            _txtFullName = new TextBox { Location = new Point(20, 40), Width = 180 };
-            _txtPhone = new TextBox { Location = new Point(210, 40), Width = 130 };
-            _txtEmail = new TextBox { Location = new Point(350, 40), Width = 180 };
-            _txtAddress = new TextBox { Location = new Point(540, 40), Width = 180 };
-            _numPoints = new NumericUpDown { Location = new Point(730, 40), Width = 90, Maximum = 1000000 };
-
-            Button btnAdd = new RoundedButton { Text = "Add", Location = new Point(840, 38), Width = 60, CornerRadius = 6 };
-            btnAdd.Click += BtnAdd_Click;
-
-            Button btnUpdate = new RoundedButton { Text = "Update", Location = new Point(905, 38), Width = 70, CornerRadius = 6 };
-            btnUpdate.Click += BtnUpdate_Click;
-
-            Button btnDelete = new RoundedButton { Text = "Delete", Location = new Point(905, 75), Width = 70, CornerRadius = 6 };
-            btnDelete.Click += BtnDelete_Click;
-
-            _txtSearch = new TextBox { Location = new Point(20, 105), Width = 300 };
+            _txtSearch = new TextBox
+            {
+                Text = "",
+                Location = new Point(searchCard.Padding.Left, searchCard.Padding.Top),
+                Size = new Size(876, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
             _txtSearch.TextChanged += async (_, __) => await LoadCustomersAsync(_txtSearch.Text);
+            searchCard.Controls.Add(_txtSearch);
 
+            var btnAdd = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add", 80, 36);
+            btnAdd.Location = new Point(searchCard.Padding.Left + 10 + 876 - 80, 10);
+            btnAdd.Click += BtnAdd_Click;
+            searchCard.Controls.Add(btnAdd);
+
+            // Stats cards row
+            var statsPanel = new Panel
+            {
+                Location = new Point(20, 150),
+                Size = new Size(920, 60),
+                BackColor = Color.Transparent
+            };
+
+            var lowStockCard = UIStyleKit.CreateStatCard("Active", "0", IconHelper.Glyphs.Customers, ThemeManager.Primary, 180, 50);
+            lowStockCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(lowStockCard);
+
+            var totalCard = UIStyleKit.CreateStatCard("Total", "0", IconHelper.Glyphs.Customers, ThemeManager.Info, 180, 50);
+            totalCard.Location = new Point(210, 10);
+            statsPanel.Controls.Add(totalCard);
+
+            // Action buttons panel
+            var actionsPanel = new Panel
+            {
+                Location = new Point(20, 220),
+                Size = new Size(920, 40),
+                BackColor = Color.Transparent
+            };
+
+            var btnAdd2 = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add Customer", 120, 36);
+            btnAdd2.Location = new Point(20, 2);
+            actionsPanel.Controls.Add(btnAdd2);
+
+            var btnUpdate2 = UIStyleKit.CreateButton(ButtonStyle.Secondary, "Update", 100, 36);
+            btnUpdate2.Location = new Point(150, 2);
+            actionsPanel.Controls.Add(btnUpdate2);
+
+            var btnDelete2 = UIStyleKit.CreateButton(ButtonStyle.Danger, "Delete", 100, 36);
+            btnDelete2.Location = new Point(260, 2);
+            actionsPanel.Controls.Add(btnDelete2);
+
+            // Stock alert label
+            var lblAlert = new Label
+            {
+                Text = "Active Customers: 0",
+                Font = ThemeManager.FontCaption,
+                ForeColor = ThemeManager.Primary,
+                AutoSize = true,
+                Location = new Point(370, 12)
+            };
+
+            // Grid area
             _grid = new DataGridView
             {
-                Location = new Point(20, 140),
+                Location = new Point(20, 270),
                 Size = new Size(955, 450),
                 ReadOnly = true,
                 AutoGenerateColumns = false,
@@ -80,7 +148,7 @@ namespace Super_Shop_Management_System.Forms
                 AllowUserToAddRows = false
             };
 
-DataGridStyler.ApplyModernStyle(_grid);
+            DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CustomerID", HeaderText = "ID", Width = 50 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "FullName", HeaderText = "Customer", Width = 170 });
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Phone", HeaderText = "Phone", Width = 110 });
@@ -91,8 +159,11 @@ DataGridStyler.ApplyModernStyle(_grid);
             _grid.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CreatedDate", HeaderText = "Registered", Width = 120 });
             _grid.SelectionChanged += Grid_SelectionChanged;
 
-            Controls.Add(title);
-            Controls.Add(panel);
+            Controls.Add(headerPanel);
+            Controls.Add(searchCard);
+            Controls.Add(statsPanel);
+            Controls.Add(actionsPanel);
+            Controls.Add(lblAlert);
             Controls.Add(_grid);
         }
 

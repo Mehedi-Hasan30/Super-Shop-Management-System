@@ -61,8 +61,28 @@ namespace Super_Shop_Management_System.Forms
             _btnThemeToggle.MouseLeave += (s, e) => _btnThemeToggle.BackColor = Color.Transparent;
             _btnThemeToggle.Click += (s, e) => ThemeToggled?.Invoke(this, EventArgs.Empty);
 
+            // User profile avatar section
+            var avatarPanel = new Panel
+            {
+                Location = new Point(820, 20),
+                Size = new Size(100, 32),
+                BackColor = Color.Transparent
+            };
+            var avatarLabel = new Label
+            {
+                Text = SessionManager.FullName[0].ToString(),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                ForeColor = Color.White,
+                AutoSize = true,
+                Location = new Point(0, 0),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+            avatarLabel.Click += (s, e) => MessageBox.Show($"Welcome back, {SessionManager.FullName}!", "User Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            avatarPanel.Controls.Add(avatarLabel);
+
             _panel.Controls.Add(_lblTitle);
             _panel.Controls.Add(_lblUser);
+            _panel.Controls.Add(avatarPanel);
             _panel.Controls.Add(_btnThemeToggle);
             Controls.Add(_panel);
         }

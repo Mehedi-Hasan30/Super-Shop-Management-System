@@ -4,6 +4,14 @@ using System.Windows.Forms;
 
 namespace Super_Shop_Management_System.Helpers
 {
+    public enum ButtonStyle
+    {
+        Primary,
+        Secondary,
+        Danger,
+        Success
+    }
+
     public class RoundedPanel : Panel
     {
         public int CornerRadius { get; set; } = 10;
@@ -167,6 +175,68 @@ namespace Super_Shop_Management_System.Helpers
             return button;
         }
 
+        public static RoundedButton CreateButton(ButtonStyle style, string text, int width = 140, int height = 40)
+        {
+            var button = new RoundedButton
+            {
+                Text = text,
+                Width = width,
+                Height = height,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand,
+                CornerRadius = 8
+            };
+
+            // Set FlatAppearance after construction (cannot initialize in object initializer)
+            button.FlatAppearance.BorderSize = 0;
+
+            Color normalColor;
+            Color hoverColor;
+
+            switch (style)
+            {
+                case ButtonStyle.Primary:
+                    normalColor = ThemeManager.Primary;
+                    hoverColor = ThemeManager.PrimaryDark;
+                    button.ForeColor = Color.White;
+                    break;
+
+                case ButtonStyle.Secondary:
+                    normalColor = ThemeManager.PanelBackground;
+                    hoverColor = ThemeManager.CurrentTheme == AppTheme.Dark
+                        ? Color.FromArgb(45, 45, 45)
+                        : Color.FromArgb(235, 242, 247);
+                    button.ForeColor = ThemeManager.Primary;
+                    button.FlatAppearance.BorderSize = 1;
+                    button.FlatAppearance.BorderColor = ThemeManager.Primary;
+                    break;
+
+                case ButtonStyle.Danger:
+                    normalColor = ThemeManager.Danger;
+                    hoverColor = Color.FromArgb(194, 62, 49);
+                    button.ForeColor = Color.White;
+                    break;
+
+                case ButtonStyle.Success:
+                    normalColor = ThemeManager.Success;
+                    hoverColor = Color.FromArgb(33, 150, 86);
+                    button.ForeColor = Color.White;
+                    break;
+
+                default:
+                    normalColor = ThemeManager.Primary;
+                    hoverColor = ThemeManager.PrimaryDark;
+                    button.ForeColor = Color.White;
+                    break;
+            }
+
+            button.BackColor = normalColor;
+            button.MouseEnter += (s, e) => button.BackColor = hoverColor;
+            button.MouseLeave += (s, e) => button.BackColor = normalColor;
+
+            return button;
+        }
+
         public static RoundedPanel CreateStatCard(string title, string value, string glyph, Color accentColor, int width = 220, int height = 110)
         {
             var card = new RoundedPanel
@@ -222,5 +292,3 @@ namespace Super_Shop_Management_System.Helpers
         }
     }
 }
-
-

@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using Super_Shop_Management_System.BLL;
 using Super_Shop_Management_System.Helpers;
 using Super_Shop_Management_System.Models;
-using Super_Shop_Management_System.Helpers;
 
 namespace Super_Shop_Management_System.Forms
 {
@@ -29,7 +28,7 @@ namespace Super_Shop_Management_System.Forms
         private Label _lblStockAlert;
         private int _selectedProductId;
 
-        public ProductUserControl()
+public ProductUserControl()
         {
             Dock = DockStyle.Fill;
             BackColor = ThemeManager.Background;
@@ -41,22 +40,116 @@ namespace Super_Shop_Management_System.Forms
         }
 
         private void InitializeUserControl()
+        {
+            // Premium header with icon and separator
+            var headerPanel = new Panel
             {
+                Location = new Point(0, 0),
+                Size = new Size(1160, 80),
+                BackColor = ThemeManager.Sidebar,
+                Padding = new Padding(0)
+            };
+
+            // Icon label
+            var iconLabel = IconHelper.CreateIconLabel(IconHelper.Glyphs.Products, 32F, ThemeManager.Primary);
+            iconLabel.Location = new Point(20, 20);
+            headerPanel.Controls.Add(iconLabel);
+
+            // Title
             var title = new Label
             {
                 Text = "Product Management",
                 Font = ThemeManager.FontH2,
-                ForeColor = ThemeManager.Foreground,
+                ForeColor = Color.White,
                 AutoSize = true,
-                Location = new Point(20, 20)
+                Location = new Point(60, 25)
             };
-            Controls.Add(title);
+            headerPanel.Controls.Add(title);
 
-            // Form fields panel
+            // Separator line
+            var separator = new Panel
+            {
+                Location = new Point(60, 55),
+                Size = new Size(150, 1),
+                BackColor = ThemeManager.BorderColor
+            };
+            headerPanel.Controls.Add(separator);
+
+            // Search section card
+            var searchCard = new RoundedPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(1120, 50),
+                BorderColor = ThemeManager.BorderColor,
+                Padding = new Padding(12)
+            };
+
+            _txtSearch = new TextBox
+            {
+                Text = "",
+                Location = new Point(searchCard.Padding.Left, searchCard.Padding.Top),
+                Size = new Size(1076, 30),
+                BorderStyle = BorderStyle.None,
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText
+            };
+            _txtSearch.TextChanged += (_, __) => LoadProducts(_txtSearch.Text);
+            searchCard.Controls.Add(_txtSearch);
+
+            // Add button with UIStyleKit
+            var btnSearchAdd = UIStyleKit.CreateButton(ButtonStyle.Primary, "Add Product", 100, 36);
+            btnSearchAdd.Location = new Point(searchCard.Padding.Left + 10 + 1076 - 100, 10);
+            btnSearchAdd.Click += BtnAdd_Click;
+            searchCard.Controls.Add(btnSearchAdd);
+
+            // Stats cards row
+            var statsPanel = new Panel
+            {
+                Location = new Point(20, 150),
+                Size = new Size(1120, 80),
+                BackColor = Color.Transparent
+            };
+
+            // Low Stock stat card
+            var lowStockCard = UIStyleKit.CreateStatCard("Low Stock", "0", IconHelper.Glyphs.Alert, ThemeManager.Warning, 200, 60);
+            lowStockCard.Location = new Point(20, 10);
+            statsPanel.Controls.Add(lowStockCard);
+
+            // Total Products stat card
+            var totalProductsCard = UIStyleKit.CreateStatCard("Total Products", "0", IconHelper.Glyphs.Products, ThemeManager.Primary, 200, 60);
+            totalProductsCard.Location = new Point(230, 10);
+            statsPanel.Controls.Add(totalProductsCard);
+
+            // Category count card
+            var categoryCard = UIStyleKit.CreateStatCard("Categories", "0", IconHelper.Glyphs.Inventory, ThemeManager.Info, 200, 60);
+            categoryCard.Location = new Point(440, 10);
+            statsPanel.Controls.Add(categoryCard);
+
+            // Supplier count card
+            var supplierCard = UIStyleKit.CreateStatCard("Suppliers", "0", IconHelper.Glyphs.Suppliers, ThemeManager.Success, 200, 60);
+            supplierCard.Location = new Point(650, 10);
+            statsPanel.Controls.Add(supplierCard);
+
+            // Stock alert label
+            _lblStockAlert = new Label
+            {
+                Text = $"Low Stock Items: 0",
+                Font = ThemeManager.FontCaption,
+                ForeColor = ThemeManager.Warning,
+                AutoSize = true,
+                Location = new Point(860, 25)
+            };
+
+            Controls.Add(headerPanel);
+            Controls.Add(searchCard);
+            Controls.Add(statsPanel);
+            Controls.Add(_lblStockAlert);
+
+            // Form fields panel (original)
             var panel = new Panel
             {
-                Location = new Point(20, 60),
-                Size = new Size(1100, 200),
+                Location = new Point(20, 240),
+                Size = new Size(1120, 200),
                 BackColor = ThemeManager.PanelBackground,
                 Padding = new Padding(12)
             };
