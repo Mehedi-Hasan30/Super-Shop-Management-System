@@ -13,9 +13,21 @@ namespace Super_Shop_Management_System.Forms
         private ShellHeader _header;
         private SidebarNavigation _sidebarNav;
         private Panel _moduleContainer;
-        private ValueAnimator _kpiAnimator;
-        private readonly int[] _kpiValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        private readonly string[] _kpiLabels = { "DailySales", "MonthlySales", "TotalProducts", "TotalCategories", "LowStock", "TotalCustomers", "TotalSuppliers", "TotalEmployees", "AttendanceSummary", "Notifications" };
+
+        private readonly string[] _kpiLabels =
+        {
+            "DailySales",
+            "MonthlySales",
+            "TotalProducts",
+            "TotalCategories",
+            "LowStock",
+            "TotalCustomers",
+            "TotalSuppliers",
+            "TotalEmployees",
+            "AttendanceSummary",
+            "Notifications"
+        };
+
 
         public DashboardShell(string userRole)
         {
@@ -26,24 +38,46 @@ namespace Super_Shop_Management_System.Forms
 
             ThemeManager.ApplyFormTheme(this);
 
-            // Use ThemeColors from the design system
             Color sidebarColor = ThemeColors.Sidebar;
             Color backgroundColor = ThemeColors.Background;
-            Color cardColor = ThemeColors.Card;
             Color textPrimary = ThemeColors.TextPrimary;
             Color textMuted = ThemeColors.TextMuted;
             Color accentColor = ThemeColors.Primary;
 
-            _sidebar = new Panel { Dock = DockStyle.Left, Width = 240, BackColor = sidebarColor, Tag = ThemeManager.ThemeExemptTag };
-            _sidebar.Paint += (_, __) => { };
 
-            _sidebarNav = new SidebarNavigation(userRole);
-            _sidebarNav.Dock = DockStyle.Fill;
+            _sidebar = new Panel
+            {
+                Dock = DockStyle.Left,
+                Width = 240,
+                BackColor = sidebarColor,
+                Tag = ThemeManager.ThemeExemptTag
+            };
+
+
+            _sidebarNav = new SidebarNavigation(userRole)
+            {
+                Dock = DockStyle.Fill
+            };
+
             _sidebar.Controls.Add(_sidebarNav);
 
-            var brandPanel = new Panel { Dock = DockStyle.Top, Height = 64, BackColor = sidebarColor };
-            var brandIcon = IconHelper.CreateIconLabel(IconHelper.Glyphs.Products, 20F, accentColor);
+
+            var brandPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 64,
+                BackColor = sidebarColor
+            };
+
+
+            var brandIcon = IconHelper.CreateIconLabel(
+                IconHelper.Glyphs.Products,
+                20F,
+                accentColor);
+
             brandIcon.Location = new Point(20, 20);
+
+
             var brandText = new Label
             {
                 Text = "Super Shop",
@@ -52,17 +86,39 @@ namespace Super_Shop_Management_System.Forms
                 AutoSize = true,
                 Location = new Point(52, 20)
             };
-            var brandDivider = new Panel { Dock = DockStyle.Bottom, Height = 1, BackColor = ThemeManager.SidebarButton };
+
+
+            var brandDivider = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 1,
+                BackColor = ThemeManager.SidebarButton
+            };
+
+
             brandPanel.Controls.Add(brandIcon);
             brandPanel.Controls.Add(brandText);
             brandPanel.Controls.Add(brandDivider);
+
             _sidebar.Controls.Add(brandPanel);
 
-            _header = new ShellHeader(userRole);
-            _header.Dock = DockStyle.Top;
-            _header.Height = 64;
 
-            _content = new Panel { Dock = DockStyle.Fill, Padding = new Padding(28), BackColor = backgroundColor, AutoScroll = true };
+
+            _header = new ShellHeader(userRole)
+            {
+                Dock = DockStyle.Top,
+                Height = 64
+            };
+
+
+            _content = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(28),
+                BackColor = backgroundColor,
+                AutoScroll = true
+            };
+
 
             var welcomeLabel = new Label
             {
@@ -71,7 +127,9 @@ namespace Super_Shop_Management_System.Forms
                 ForeColor = textPrimary,
                 AutoSize = true
             };
+
             _content.Controls.Add(welcomeLabel);
+
 
             var roleLabel = new Label
             {
@@ -81,84 +139,92 @@ namespace Super_Shop_Management_System.Forms
                 AutoSize = true,
                 Location = new Point(10, welcomeLabel.Bottom + 2)
             };
+
             _content.Controls.Add(roleLabel);
 
-            // KPI premium cards panel
+
+
             var kpiPanel = new Panel
             {
                 Location = new Point(10, roleLabel.Bottom + 14),
-                Size = new Size(1300, 100),
+                Size = new Size(1280, 100),
                 BackColor = Color.Transparent
             };
+
+
             _content.Controls.Add(kpiPanel);
 
-            // Daily Sales card
-            var card1 = UIStyleKit.CreateStatCard("Daily Sales", "0", IconHelper.Glyphs.Sales, ThemeManager.Success, 110, 80);
-            card1.Location = new Point(10, 10);
-            kpiPanel.Controls.Add(card1);
 
-            // Monthly Sales card
-            var card2 = UIStyleKit.CreateStatCard("Monthly Sales", "0", IconHelper.Glyphs.Sales, ThemeManager.Primary, 110, 80);
-            card2.Location = new Point(120, 10);
-            kpiPanel.Controls.Add(card2);
 
-            // Total Products card
-            var card3 = UIStyleKit.CreateStatCard("Total Products", "0", IconHelper.Glyphs.Inventory, ThemeManager.Info, 110, 80);
-            card3.Location = new Point(230, 10);
-            kpiPanel.Controls.Add(card3);
+            AddKpiCard(kpiPanel, "Daily Sales", IconHelper.Glyphs.Sales, ThemeManager.Success, 10);
+            AddKpiCard(kpiPanel, "Monthly Sales", IconHelper.Glyphs.Sales, ThemeManager.Primary, 120);
+            AddKpiCard(kpiPanel, "Total Products", IconHelper.Glyphs.Inventory, ThemeManager.Info, 230);
+            AddKpiCard(kpiPanel, "Total Categories", IconHelper.Glyphs.Inventory, ThemeManager.Primary, 340);
+            AddKpiCard(kpiPanel, "Low Stock", IconHelper.Glyphs.Alert, ThemeManager.Warning, 450);
+            AddKpiCard(kpiPanel, "Total Customers", IconHelper.Glyphs.Customers, ThemeManager.Primary, 560);
+            AddKpiCard(kpiPanel, "Total Suppliers", IconHelper.Glyphs.Suppliers, ThemeManager.Success, 670);
+            AddKpiCard(kpiPanel, "Total Employees", IconHelper.Glyphs.Employees, ThemeManager.Info, 780);
+            AddKpiCard(kpiPanel, "Attendance", IconHelper.Glyphs.Attendance, ThemeManager.Warning, 890);
+            AddKpiCard(kpiPanel, "Notifications", IconHelper.Glyphs.Info, ThemeManager.Primary, 1000);
 
-            // Total Categories card
-            var card4 = UIStyleKit.CreateStatCard("Total Categories", "0", IconHelper.Glyphs.Inventory, ThemeManager.Primary, 110, 80);
-            card4.Location = new Point(340, 10);
-            kpiPanel.Controls.Add(card4);
 
-            // Low Stock card
-            var card5 = UIStyleKit.CreateStatCard("Low Stock", "0", IconHelper.Glyphs.Alert, ThemeManager.Warning, 110, 80);
-            card5.Location = new Point(450, 10);
-            kpiPanel.Controls.Add(card5);
 
-            // Total Customers card
-            var card6 = UIStyleKit.CreateStatCard("Total Customers", "0", IconHelper.Glyphs.Customers, ThemeManager.Primary, 110, 80);
-            card6.Location = new Point(560, 10);
-            kpiPanel.Controls.Add(card6);
+            _moduleContainer = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = backgroundColor,
+                AutoScroll = true,
+                Padding = new Padding(20)
+            };
 
-            // Total Suppliers card
-            var card7 = UIStyleKit.CreateStatCard("Total Suppliers", "0", IconHelper.Glyphs.Suppliers, ThemeManager.Success, 110, 80);
-            card7.Location = new Point(670, 10);
-            kpiPanel.Controls.Add(card7);
 
-            // Total Employees card
-            var card8 = UIStyleKit.CreateStatCard("Total Employees", "0", IconHelper.Glyphs.Employees, ThemeManager.Info, 110, 80);
-            card8.Location = new Point(780, 10);
-            kpiPanel.Controls.Add(card8);
-
-            // Attendance card
-            var card9 = UIStyleKit.CreateStatCard("Attendance", "0", IconHelper.Glyphs.Attendance, ThemeManager.Warning, 110, 80);
-            card9.Location = new Point(890, 10);
-            kpiPanel.Controls.Add(card9);
-
-            // Notifications card
-            var card10 = UIStyleKit.CreateStatCard("Notifications", "0", IconHelper.Glyphs.Info, ThemeManager.Primary, 110, 80);
-            card10.Location = new Point(1000, 10);
-            kpiPanel.Controls.Add(card10);
-
-            _moduleContainer = new Panel { Dock = DockStyle.Fill, BackColor = backgroundColor, AutoScroll = true, Padding = new Padding(20) };
             _content.Controls.Add(_moduleContainer);
+
 
             Controls.Add(_content);
             Controls.Add(_sidebar);
             Controls.Add(_header);
 
+
             _sidebarNav.NavButtonClicked += OnNavButtonClicked;
             _header.ThemeToggled += OnThemeToggled;
         }
 
+
+
+        private void AddKpiCard(
+            Panel parent,
+            string title,
+            string icon,
+            Color color,
+            int x)
+        {
+            var card = UIStyleKit.CreateStatCard(
+                title,
+                "0",
+                icon,
+                color,
+                110,
+                80);
+
+            card.Location = new Point(x, 10);
+            parent.Controls.Add(card);
+        }
+
+
+
         private void OnNavButtonClicked(object sender, string moduleName)
         {
-            // Smooth transition before loading module
-            Transition.AnimateWidth(_moduleContainer, _moduleContainer.Width, _moduleContainer.Width, 200);
+            Transition.AnimateWidth(
+                _moduleContainer,
+                _moduleContainer.Width,
+                _moduleContainer.Width,
+                200);
+
             ModuleLoader.LoadModule(_moduleContainer, moduleName);
         }
+
+
 
         private void OnThemeToggled(object sender, EventArgs e)
         {
@@ -166,26 +232,23 @@ namespace Super_Shop_Management_System.Forms
             ApplyThemeToAll();
         }
 
+
+
         private void ApplyThemeToAll()
         {
             ThemeManager.ApplyFormTheme(this);
             _sidebarNav?.ApplyTheme();
         }
 
+
+
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            _sidebar?.Width = 240;
-        }
 
-        // Paint handler for animated KPI cards
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            // Draw animated KPI cards background
-            using (var brush = new SolidBrush(Color.FromArgb(200, 255, 255, 255)))
+            if (_sidebar != null)
             {
-                e.Graphics.FillRectangle(brush, ClientRectangle);
+                _sidebar.Width = 240;
             }
         }
     }

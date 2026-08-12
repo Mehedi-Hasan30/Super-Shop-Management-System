@@ -64,7 +64,7 @@ namespace Super_Shop_Management_System.Forms
             // User profile avatar section
             var avatarPanel = new Panel
             {
-                Location = new Point(820, 20),
+                Location = new Point(_lblUser.Right + 10, 20),
                 Size = new Size(100, 32),
                 BackColor = Color.Transparent
             };
