@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -44,34 +44,42 @@ namespace Super_Shop_Management_System.Forms
             WindowState = FormWindowState.Maximized;
             ThemeManager.ApplyFormTheme(this);
 
-            Panel sidebar = new Panel { Dock = DockStyle.Left, Width = 235, BackColor = ThemeManager.Sidebar };
-            sidebar.Controls.Add(new Label
+            Panel sidebar = new Panel { Dock = DockStyle.Left, Width = 240, BackColor = ThemeManager.Sidebar, Tag = ThemeManager.ThemeExemptTag };
+
+            Panel brandPanel = new Panel { Dock = DockStyle.Top, Height = 64, BackColor = ThemeManager.Sidebar };
+            Label brandIcon = IconHelper.CreateIconLabel(IconHelper.Glyphs.Products, 20F, Color.White);
+            brandIcon.Location = new Point(20, 20);
+            Label brandText = new Label
             {
                 Text = "Super Shop",
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                Font = ThemeManager.FontH2,
                 AutoSize = true,
-                Location = new Point(50, 24)
-            });
+                Location = new Point(52, 20)
+            };
+            Panel brandDivider = new Panel { Dock = DockStyle.Bottom, Height = 1, BackColor = ThemeManager.SidebarButton };
+            brandPanel.Controls.Add(brandIcon);
+            brandPanel.Controls.Add(brandText);
+            brandPanel.Controls.Add(brandDivider);
 
-            int top = 75;
+            int top = 16;
             ToolTip toolTip = new ToolTip();
-            Button btnCategory = CreateSidebarButton("Category Management", top); top += 42;
-            Button btnProduct = CreateSidebarButton("Product Management", top); top += 42;
-            Button btnPosSales = CreateSidebarButton("POS Sales", top); top += 42;
-            Button btnCustomer = CreateSidebarButton("Customer Management", top); top += 42;
-            Button btnCustomerSalesHistory = CreateSidebarButton("Customer Sales History", top); top += 42;
-            Button btnReports = CreateSidebarButton("Reports & Analytics", top); top += 42;
-            Button btnSettings = CreateSidebarButton("Settings", top); top += 42;
-            Button btnBackupRestore = CreateSidebarButton("Backup & Restore", top); top += 42;
-            Button btnSupplier = CreateSidebarButton("Supplier Management", top); top += 42;
-            Button btnEmployee = CreateSidebarButton("Employee Management", top); top += 42;
-            Button btnAttendance = CreateSidebarButton("Attendance", top); top += 42;
-            Button btnAttendanceReport = CreateSidebarButton("Attendance Report", top); top += 42;
-            Button btnAuditLogs = CreateSidebarButton("Audit Logs", top); top += 42;
-            Button btnSmokeTest = CreateSidebarButton("QA Smoke Test", top); top += 42;
-            Button btnRefresh = CreateSidebarButton("Refresh Metrics", top); top += 42;
-            Button btnLogout = CreateSidebarButton("Logout", top);
+            Button btnCategory = CreateSidebarButton(IconHelper.Glyphs.Inventory, "Category Management", top); top += 44;
+            Button btnProduct = CreateSidebarButton(IconHelper.Glyphs.Products, "Product Management", top); top += 44;
+            Button btnPosSales = CreateSidebarButton(IconHelper.Glyphs.Sales, "POS Sales", top); top += 44;
+            Button btnCustomer = CreateSidebarButton(IconHelper.Glyphs.Customers, "Customer Management", top); top += 44;
+            Button btnCustomerSalesHistory = CreateSidebarButton(IconHelper.Glyphs.Reports, "Customer Sales History", top); top += 44;
+            Button btnReports = CreateSidebarButton(IconHelper.Glyphs.Reports, "Reports & Analytics", top); top += 44;
+            Button btnSettings = CreateSidebarButton(IconHelper.Glyphs.Settings, "Settings", top); top += 44;
+            Button btnBackupRestore = CreateSidebarButton(IconHelper.Glyphs.Backup, "Backup & Restore", top); top += 44;
+            Button btnSupplier = CreateSidebarButton(IconHelper.Glyphs.Suppliers, "Supplier Management", top); top += 44;
+            Button btnEmployee = CreateSidebarButton(IconHelper.Glyphs.Employees, "Employee Management", top); top += 44;
+            Button btnAttendance = CreateSidebarButton(IconHelper.Glyphs.Attendance, "Attendance", top); top += 44;
+            Button btnAttendanceReport = CreateSidebarButton(IconHelper.Glyphs.Attendance, "Attendance Report", top); top += 44;
+            Button btnAuditLogs = CreateSidebarButton(IconHelper.Glyphs.AuditLog, "Audit Logs", top); top += 44;
+            Button btnSmokeTest = CreateSidebarButton(IconHelper.Glyphs.Success, "QA Smoke Test", top); top += 44;
+            Button btnRefresh = CreateSidebarButton(IconHelper.Glyphs.Refresh, "Refresh Metrics", top); top += 44;
+            Button btnLogout = CreateSidebarButton(IconHelper.Glyphs.Logout, "Logout", top);
 
             toolTip.SetToolTip(btnSettings, "Theme and preferences");
             toolTip.SetToolTip(btnBackupRestore, "Admin-only database backup/restore");
@@ -95,70 +103,79 @@ namespace Super_Shop_Management_System.Forms
 
             if (!string.Equals(_userRole, "Admin", StringComparison.OrdinalIgnoreCase))
             {
-                btnCategory.Enabled = false;
-                btnCategory.BackColor = Color.FromArgb(80, 80, 80);
-                btnEmployee.Enabled = false;
-                btnEmployee.BackColor = Color.FromArgb(80, 80, 80);
-                btnAuditLogs.Enabled = false;
-                btnAuditLogs.BackColor = Color.FromArgb(80, 80, 80);
-                btnSmokeTest.Enabled = false;
-                btnSmokeTest.BackColor = Color.FromArgb(80, 80, 80);
-                btnBackupRestore.Enabled = false;
-                btnBackupRestore.BackColor = Color.FromArgb(80, 80, 80);
+                DisableSidebarButton(btnCategory);
+                DisableSidebarButton(btnEmployee);
+                DisableSidebarButton(btnAuditLogs);
+                DisableSidebarButton(btnSmokeTest);
+                DisableSidebarButton(btnBackupRestore);
             }
 
-            sidebar.Controls.Add(btnCategory);
-            sidebar.Controls.Add(btnProduct);
-            sidebar.Controls.Add(btnPosSales);
-            sidebar.Controls.Add(btnCustomer);
-            sidebar.Controls.Add(btnCustomerSalesHistory);
-            sidebar.Controls.Add(btnReports);
-            sidebar.Controls.Add(btnSettings);
-            sidebar.Controls.Add(btnBackupRestore);
-            sidebar.Controls.Add(btnSupplier);
-            sidebar.Controls.Add(btnEmployee);
-            sidebar.Controls.Add(btnAttendance);
-            sidebar.Controls.Add(btnAttendanceReport);
-            sidebar.Controls.Add(btnAuditLogs);
-            sidebar.Controls.Add(btnSmokeTest);
-            sidebar.Controls.Add(btnRefresh);
-            sidebar.Controls.Add(btnLogout);
+            Panel navScroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true, BackColor = ThemeManager.Sidebar };
+            navScroll.Controls.Add(btnCategory);
+            navScroll.Controls.Add(btnProduct);
+            navScroll.Controls.Add(btnPosSales);
+            navScroll.Controls.Add(btnCustomer);
+            navScroll.Controls.Add(btnCustomerSalesHistory);
+            navScroll.Controls.Add(btnReports);
+            navScroll.Controls.Add(btnSettings);
+            navScroll.Controls.Add(btnBackupRestore);
+            navScroll.Controls.Add(btnSupplier);
+            navScroll.Controls.Add(btnEmployee);
+            navScroll.Controls.Add(btnAttendance);
+            navScroll.Controls.Add(btnAttendanceReport);
+            navScroll.Controls.Add(btnAuditLogs);
+            navScroll.Controls.Add(btnSmokeTest);
+            navScroll.Controls.Add(btnRefresh);
+            navScroll.Controls.Add(btnLogout);
 
-            Panel content = new Panel { Dock = DockStyle.Fill, Padding = new Padding(25) };
-            content.Controls.Add(new Label
+            sidebar.Controls.Add(navScroll);
+            sidebar.Controls.Add(brandPanel);
+
+            Panel content = new Panel { Dock = DockStyle.Fill, Padding = new Padding(28), AutoScroll = true };
+            Label welcomeLabel = new Label
             {
-                Text = $"Welcome, {SessionManager.FullName} ({SessionManager.Role})",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Text = $"Welcome back, {SessionManager.FullName}",
+                Font = ThemeManager.FontH1,
                 ForeColor = ThemeManager.Foreground,
                 AutoSize = true,
                 Location = new Point(10, 10)
-            });
+            };
+            Label roleLabel = new Label
+            {
+                Text = $"{SessionManager.Role} - Here's what's happening in your store today",
+                Font = ThemeManager.FontBody,
+                ForeColor = ThemeManager.MutedText,
+                AutoSize = true,
+                Location = new Point(10, welcomeLabel.Bottom + 2)
+            };
+            content.Controls.Add(welcomeLabel);
+            content.Controls.Add(roleLabel);
 
             FlowLayoutPanel cardContainer = new FlowLayoutPanel
             {
-                Location = new Point(10, 48),
-                Size = new Size(1350, 400),
+                Location = new Point(6, roleLabel.Bottom + 20),
+                Size = new Size(1350, 260),
                 WrapContents = true,
                 AutoScroll = true
             };
 
-            _lblDailySales = CreateCard(cardContainer, "Daily Sales");
-            _lblMonthlySales = CreateCard(cardContainer, "Monthly Sales");
-            _lblTotalProducts = CreateCard(cardContainer, "Total Products");
-            _lblTotalCategories = CreateCard(cardContainer, "Total Categories");
-            _lblLowStock = CreateCard(cardContainer, "Low Stock Alerts");
-            _lblTotalCustomers = CreateCard(cardContainer, "Total Customers");
-            _lblTotalSuppliers = CreateCard(cardContainer, "Total Suppliers");
-            _lblTotalEmployees = CreateCard(cardContainer, "Total Employees");
-            _lblAttendanceSummary = CreateCard(cardContainer, "Attendance Summary");
-            _lblNotifications = CreateCard(cardContainer, "Notifications");
+            _lblDailySales = CreateStatCard(cardContainer, "Daily Sales", IconHelper.Glyphs.Sales, ThemeManager.Success);
+            _lblMonthlySales = CreateStatCard(cardContainer, "Monthly Sales", IconHelper.Glyphs.Reports, ThemeManager.Primary);
+            _lblTotalProducts = CreateStatCard(cardContainer, "Total Products", IconHelper.Glyphs.Products, ThemeManager.Info);
+            _lblTotalCategories = CreateStatCard(cardContainer, "Total Categories", IconHelper.Glyphs.Inventory, ThemeManager.Accent);
+            _lblLowStock = CreateStatCard(cardContainer, "Low Stock Alerts", IconHelper.Glyphs.Warning, ThemeManager.Warning);
+            _lblTotalCustomers = CreateStatCard(cardContainer, "Total Customers", IconHelper.Glyphs.Customers, ThemeManager.Primary);
+            _lblTotalSuppliers = CreateStatCard(cardContainer, "Total Suppliers", IconHelper.Glyphs.Suppliers, ThemeManager.Accent);
+            _lblTotalEmployees = CreateStatCard(cardContainer, "Total Employees", IconHelper.Glyphs.Employees, ThemeManager.Primary);
+            _lblAttendanceSummary = CreateStatCard(cardContainer, "Attendance Summary", IconHelper.Glyphs.Attendance, ThemeManager.Info);
+            _lblNotifications = CreateStatCard(cardContainer, "Notifications", IconHelper.Glyphs.Alert, ThemeManager.Danger);
 
             content.Controls.Add(cardContainer);
 
             _notificationPanel = new FlowLayoutPanel
             {
-                Location = new Point(10, 450),
-                Size = new Size(1350, 170),
+                Location = new Point(6, cardContainer.Bottom + 10),
+                Size = new Size(1350, 220),
                 WrapContents = false,
                 AutoScroll = true,
                 BackColor = Color.Transparent
@@ -168,22 +185,57 @@ namespace Super_Shop_Management_System.Forms
             Controls.Add(sidebar);
         }
 
-        private static Button CreateSidebarButton(string text, int top)
+        private static void DisableSidebarButton(Button button)
         {
-            Button button = new Button { Text = text, Width = 190, Height = 34, Location = new Point(20, top) };
-            FormDesignHelper.ApplySidebarButtonStyle(button);
+            button.Enabled = false;
+            button.BackColor = ThemeManager.SidebarButtonHover;
+            button.ForeColor = Color.FromArgb(140, 140, 140);
+        }
+
+        private static Button CreateSidebarButton(string glyph, string text, int top)
+        {
+            Button button = new Button
+            {
+                Text = string.Empty,
+                Width = 208,
+                Height = 38,
+                Location = new Point(16, top),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = ThemeManager.Sidebar,
+                ForeColor = Color.White,
+                Cursor = Cursors.Hand
+            };
+            button.FlatAppearance.BorderSize = 0;
+            UIStyleKit.ApplyRoundedRegion(button, 6);
+
+            Font iconFont = IconHelper.GlyphFont(13F);
+            string iconGlyph = IconHelper.GlyphOrFallback(glyph, "-");
+
+            button.Paint += (s, e) =>
+            {
+                TextRenderer.DrawText(e.Graphics, iconGlyph, iconFont,
+                    new Rectangle(14, 0, 24, button.Height), button.ForeColor,
+                    TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(e.Graphics, text, ThemeManager.FontBody,
+                    new Rectangle(44, 0, button.Width - 50, button.Height), button.ForeColor,
+                    TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPadding);
+            };
+
+            Color normal = ThemeManager.Sidebar;
+            Color hover = ThemeManager.SidebarButtonHover;
+            button.MouseEnter += (s, e) => { if (button.Enabled) { button.BackColor = hover; button.Invalidate(); } };
+            button.MouseLeave += (s, e) => { if (button.Enabled) { button.BackColor = normal; button.Invalidate(); } };
+
             return button;
         }
 
-        private static Label CreateCard(FlowLayoutPanel container, string title)
+        private static Label CreateStatCard(FlowLayoutPanel container, string title, string glyph, Color accentColor)
         {
-            Panel panel = new Panel { Width = 230, Height = 120, BackColor = Color.White, Margin = new Padding(14), BorderStyle = BorderStyle.FixedSingle };
-            panel.Controls.Add(new Label { Text = title, AutoSize = true, ForeColor = Color.Gray, Location = new Point(15, 15) });
-            Label value = FormDesignHelper.CreateCardLabel(title);
-            value.Location = new Point(15, 50);
-            panel.Controls.Add(value);
-            container.Controls.Add(panel);
-            return value;
+            RoundedPanel card = UIStyleKit.CreateStatCard(title, "0", glyph, accentColor, 240, 110);
+            card.Margin = new Padding(10);
+            container.Controls.Add(card);
+
+            return (Label)card.Controls[1];
         }
 
         private async Task LoadDashboardMetricsAsync()
@@ -294,3 +346,4 @@ namespace Super_Shop_Management_System.Forms
         }
     }
 }
+

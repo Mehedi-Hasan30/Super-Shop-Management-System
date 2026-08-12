@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -15,9 +15,47 @@ namespace Super_Shop_Management_System.Helpers
     {
         private const string ThemeHookTag = "__ThemeManagerHooked__";
 
+        public const string ThemeExemptTag = "__ThemeExempt__";
+
         public static readonly Color Primary = Color.FromArgb(41, 128, 185);
+        public static readonly Color PrimaryDark = Color.FromArgb(31, 97, 141);
+        public static readonly Color Accent = Color.FromArgb(52, 152, 219);
         public static readonly Color Sidebar = Color.FromArgb(33, 47, 61);
         public static readonly Color SidebarButton = Color.FromArgb(52, 73, 94);
+        public static readonly Color SidebarButtonHover = Color.FromArgb(41, 58, 74);
+        public static readonly Color SidebarButtonActive = Color.FromArgb(41, 128, 185);
+
+        public static readonly Color Success = Color.FromArgb(39, 174, 96);
+        public static readonly Color Warning = Color.FromArgb(243, 156, 18);
+        public static readonly Color Danger = Color.FromArgb(231, 76, 60);
+        public static readonly Color Info = Color.FromArgb(52, 152, 219);
+
+        public static readonly Color BorderLight = Color.FromArgb(225, 229, 233);
+        public static readonly Color BorderDark = Color.FromArgb(60, 60, 60);
+        public static readonly Color MutedTextLight = Color.FromArgb(127, 140, 141);
+        public static readonly Color MutedTextDark = Color.FromArgb(160, 160, 160);
+
+        private const string FontFamily = "Segoe UI";
+        public static readonly Font FontDisplay = new Font(FontFamily, 24F, FontStyle.Bold);
+        public static readonly Font FontH1 = new Font(FontFamily, 18F, FontStyle.Bold);
+        public static readonly Font FontH2 = new Font(FontFamily, 14F, FontStyle.Bold);
+        public static readonly Font FontH3 = new Font(FontFamily, 11F, FontStyle.Bold);
+        public static readonly Font FontBody = new Font(FontFamily, 9.5F, FontStyle.Regular);
+        public static readonly Font FontBodyBold = new Font(FontFamily, 9.5F, FontStyle.Bold);
+        public static readonly Font FontCaption = new Font(FontFamily, 8.5F, FontStyle.Regular);
+
+        public static class Spacing
+        {
+            public const int XS = 4;
+            public const int SM = 8;
+            public const int MD = 16;
+            public const int LG = 24;
+            public const int XL = 32;
+            public const int XXL = 48;
+        }
+
+        public static Color BorderColor => CurrentTheme == AppTheme.Dark ? BorderDark : BorderLight;
+        public static Color MutedText => CurrentTheme == AppTheme.Dark ? MutedTextDark : MutedTextLight;
 
         public static AppTheme CurrentTheme { get; private set; } = AppTheme.Light;
 
@@ -118,8 +156,6 @@ namespace Super_Shop_Management_System.Helpers
 
             ApplyThemeToControls(form.Controls);
 
-            // Many forms call ApplyFormTheme before their child controls are fully created.
-            // Hook ControlAdded so late-added controls (panels/labels/etc.) still get themed.
             if (!(form.Tag is string) || !string.Equals(form.Tag?.ToString(), ThemeHookTag, StringComparison.Ordinal))
             {
                 form.Tag = ThemeHookTag;
@@ -142,6 +178,11 @@ namespace Super_Shop_Management_System.Helpers
         private static void ApplyThemeToControl(Control c)
         {
             if (c == null) return;
+
+            if (c.Tag is string tag && string.Equals(tag, ThemeExemptTag, StringComparison.Ordinal))
+            {
+                return;
+            }
 
             if (c is DataGridView grid)
             {
@@ -181,7 +222,6 @@ namespace Super_Shop_Management_System.Helpers
             }
             else if (c is Button)
             {
-                // Buttons are styled by FormDesignHelper / ApplyPrimaryButton.
                 c.ForeColor = Foreground;
             }
             else
@@ -204,3 +244,5 @@ namespace Super_Shop_Management_System.Helpers
         }
     }
 }
+
+
